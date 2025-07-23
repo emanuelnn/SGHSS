@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SGHSS - Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: linear-gradient(to right, #e3f2fd, #ffffff);
+    }
+    .card {
+      border: none;
+      border-radius: 15px;
+    }
+    .dashboard-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .dashboard-buttons {
+      flex: 1;
+      min-width: 250px;
+    }
+    .chart-container {
+      flex: 1;
+      max-width: 350px;
+      min-width: 280px;
+      margin: 0 auto;
+    }
+    canvas {
+      max-height: 280px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="card p-4 shadow-lg">
+      <h2 class="text-center text-primary mb-3">Painel SGHSS</h2>
+      <p class="text-center">Bem-vindo! Escolha uma opção abaixo:</p>
+
+      <div class="dashboard-row mt-4">
+        <!-- Botões -->
+        <div class="dashboard-buttons d-grid gap-3 px-3">
+          <a href="cadastro.html" class="btn btn-outline-success btn-lg">Cadastrar Paciente</a>
+          <a href="agendamento.html" class="btn btn-outline-warning btn-lg">Agendar Consulta</a>
+          <a href="consultas.html" class="btn btn-outline-info btn-lg">Ver Pacientes e Consultas</a>
+          <a href="index.html" class="btn btn-outline-secondary btn-lg">Sair</a>
+        </div>
+
+        <!-- Gráfico -->
+        <div class="chart-container mt-4 mt-md-0">
+          <h6 class="text-center mb-2">Consultas Futuras por Especialidade</h6>
+          <canvas id="graficoPizza"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="javascript.js"></script>
+</body>
+</html>
