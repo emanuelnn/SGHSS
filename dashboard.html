@@ -6,25 +6,55 @@
   <title>SGHSS - Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container mt-5">
-    <div class="card p-4 shadow-lg">
-      <h2 class="text-center text-primary mb-3">Painel SGHSS</h2>
-      <p class="text-center">Bem-vindo! Escolha uma opção abaixo:</p>
+  <div class="card p-4 shadow-lg dashboard-card">
+    <h2 class="text-center text-primary mb-3">Painel SGHSS</h2>
 
-      <div class="dashboard-row mt-4">
-        <div class="dashboard-buttons d-grid gap-3 px-3">
-          <a href="cadastro.html" class="btn btn-outline-success btn-lg">Cadastrar Paciente</a>
-          <a href="agendamento.html" class="btn btn-outline-warning btn-lg">Agendar Consulta</a>
-          <a href="consultas.html" class="btn btn-outline-info btn-lg">Ver Pacientes e Consultas</a>
-          <a href="index.html" class="btn btn-outline-secondary btn-lg">Sair</a>
-        </div>
+    <div class="dashboard-main mt-4">
+      <div class="dashboard-options">
+        <a href="cadastro.html" class="text-decoration-none">
+          <div class="option-card border border-success">
+            <div class="option-img" style="background-image: url('img/cadastro.png');"></div>
+            <h5 class="text-success">Cadastrar Paciente</h5>
+          </div>
+        </a>
 
-        <div class="chart-container mt-4 mt-md-0">
-          <h6 class="text-center mb-2">Consultas Futuras por Especialidade</h6>
-          <canvas id="graficoPizza"></canvas>
-        </div>
+        <a href="agendamento.html" class="text-decoration-none">
+          <div class="option-card border border-warning">
+            <div class="option-img" style="background-image: url('img/agendamento.png');"></div>
+            <h5 class="text-warning">Agendar Consulta</h5>
+          </div>
+        </a>
+
+        <a href="consultas.html" class="text-decoration-none">
+          <div class="option-card border border-info">
+            <div class="option-img" style="background-image: url('img/paciente.png');"></div>
+            <h5 class="text-info">Ver Pacientes e Consultas</h5>
+          </div>
+        </a>
+
+        <a href="index.html" class="text-decoration-none">
+          <div class="option-card border border-secondary">
+            <div class="option-img" style="background-image: url('img/sair.png');"></div>
+            <h5 class="text-secondary">Sair</h5>
+          </div>
+        </a>
+      </div>
+
+      <div class="chart-container mt-5 mt-md-0">
+        <h6 class="text-center mb-3">Consultas Futuras por Especialidade</h6>
+        <canvas id="graficoPizza"></canvas>
       </div>
     </div>
   </div>
@@ -34,3 +64,4 @@
   <script src="javascript.js"></script>
 </body>
 </html>
+
