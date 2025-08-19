@@ -65,21 +65,37 @@
     }
   });
 
+  const filtroMedicoInput = document.getElementById("filtroMedico");
+
   function renderAgendas() {
+    let agendasFiltradas = agendas;
+
+    if (filtroMedicoInput && filtroMedicoInput.value.trim() !== "") {
+      const filtro = filtroMedicoInput.value.trim().toLowerCase();
+      agendasFiltradas = agendas.filter(a =>
+        a.medico.toLowerCase().includes(filtro)
+      );
+    }
+
     lista.innerHTML = "";
-    if (agendas.length === 0) {
+
+    if (agendasFiltradas.length === 0) {
       lista.innerHTML = '<li class="list-group-item">Nenhuma consulta agendada.</li>';
       return;
     }
 
-    agendas.forEach((a, i) => {
+    agendasFiltradas.forEach((a, i) => {
       const li = document.createElement("li");
       li.className = "list-group-item d-flex justify-content-between";
-      li.innerHTML = `<span><strong>${a.paciente}</strong> com <strong>${a.medico}</strong><br>${a.data} às ${a.hora}
-      <br>Contato:<strong>${a.paciente}</strong></span>
+      li.innerHTML = `<span><strong>${a.paciente}</strong> com <strong>${a.medico}</strong><br>${a.data} às ${a.hora}</span>
         <button class="btn btn-sm btn-danger" onclick="remover(${i})">Remover</button>`;
       lista.appendChild(li);
     });
+  }
+
+  // Atualiza a lista ao digitar no filtro
+  if (filtroMedicoInput) {
+    filtroMedicoInput.addEventListener("input", renderAgendas);
   }
 
   function remover(i) {

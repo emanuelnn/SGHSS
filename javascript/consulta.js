@@ -15,48 +15,62 @@
     let consultas = JSON.parse(localStorage.getItem("consultas")) || [];
     const perfil = localStorage.getItem("perfil") || "comum";
 
-    function renderPacientes() {
-      if (pacientes.length === 0) {
-        pacienteList.innerHTML =
-          '<li class="list-group-item">Nenhum paciente cadastrado.</li>';
-        return;
-      }
+    const filtroPacienteInput = document.getElementById("filtroPaciente");
 
-      pacienteList.innerHTML = "";
-      pacientes.forEach((p, index) => {
-        const li = document.createElement("li");
-        li.className =
-          "list-group-item d-flex justify-content-between align-items-center";
-        li.innerHTML = `
-                    <div>
-                        <strong>${p.nome}</strong><br>
-                        CPF: ${p.cpf} | Nasc.: ${formatarDataBR(p.nascimento)}<br>
-                        Email: ${p.email} | Tel: ${p.telefone}
-                    </div>
-                `;
-
-        if (perfil === "admin") {
-          const btn = document.createElement("button");
-          btn.textContent = "Excluir";
-          btn.className = "btn btn-sm btn-danger";
-          btn.onclick = () => {
-            if (confirm(`Deseja excluir o paciente ${p.nome}?`)) {
-              pacientes.splice(index, 1);
-              localStorage.setItem("pacientes", JSON.stringify(pacientes));
-              consultas = consultas.filter(
-                (consulta) => consulta.paciente !== p.nome
-              );
-              localStorage.setItem("consultas", JSON.stringify(consultas));
-
-              renderPacientes();
-              renderConsultas();
-            }
-          };
-          li.appendChild(btn);
-        }
-        pacienteList.appendChild(li);
-      });
+  function renderPacientes() {
+    let pacientesFiltrados = pacientes;
+    if (filtroPacienteInput && filtroPacienteInput.value.trim() !== "") {
+      const filtro = filtroPacienteInput.value.trim().toLowerCase();
+      pacientesFiltrados = pacientes.filter(p =>
+        p.nome.toLowerCase().includes(filtro)
+      );
     }
+
+    if (pacientesFiltrados.length === 0) {
+      pacienteList.innerHTML =
+        '<li class="list-group-item">Nenhum paciente cadastrado.</li>';
+      return;
+    }
+
+    pacienteList.innerHTML = "";
+    pacientesFiltrados.forEach((p, index) => {
+      const li = document.createElement("li");
+      li.className =
+        "list-group-item d-flex justify-content-between align-items-center";
+      li.innerHTML = `
+                  <div>
+                      <strong>${p.nome}</strong><br>
+                      CPF: ${p.cpf} | Nasc.: ${formatarDataBR(p.nascimento)}<br>
+                      Email: ${p.email} | Tel: ${p.telefone}
+                  </div>
+              `;
+
+      if (perfil === "admin") {
+        const btn = document.createElement("button");
+        btn.textContent = "Excluir";
+        btn.className = "btn btn-sm btn-danger";
+        btn.onclick = () => {
+          if (confirm(`Deseja excluir o paciente ${p.nome}?`)) {
+            pacientes.splice(index, 1);
+            localStorage.setItem("pacientes", JSON.stringify(pacientes));
+            consultas = consultas.filter(
+              (consulta) => consulta.paciente !== p.nome
+            );
+            localStorage.setItem("consultas", JSON.stringify(consultas));
+
+            renderPacientes();
+            renderConsultas();
+          }
+        };
+        li.appendChild(btn);
+      }
+      pacienteList.appendChild(li);
+    });
+  }
+
+  if (filtroPacienteInput) {
+    filtroPacienteInput.addEventListener("input", renderPacientes);
+  }
 
     function renderConsultas() {
       if (consultas.length === 0) {
@@ -98,7 +112,7 @@
                     </div>
                 `;
 
-        if (perfil === "admin") {
+        if (perfil === "admin" && statusConsulta != `Já passou`) {
           const btn = document.createElement("button");
           btn.textContent = "Cancelar";
           btn.className = "btn btn-sm btn-danger";
