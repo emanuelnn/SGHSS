@@ -1,9 +1,12 @@
-    const pacientes = JSON.parse(localStorage.getItem("pacientes")) || [];
+    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+    const pacientes = usuarios.filter(u => u.tipoUsuario === "Paciente");
     const prescricoes = JSON.parse(localStorage.getItem("prescricoes")) || [];
 
     const pacienteSelect = document.getElementById("paciente");
     const lista = document.getElementById("listaPrescricoes");
 
+    const perfil = localStorage.getItem("perfil") || "comum";
+    
     pacientes.forEach(p => {
       const opt = document.createElement("option");
       opt.value = p.nome;

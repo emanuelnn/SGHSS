@@ -1,71 +1,49 @@
-// Especialidades médicas disponíveis
+// Especialidades médicas
 const especialidades = [
-  "Clínico Geral",
-  "Pediatria",
-  "Dermatologia",
-  "Cardiologia",
-  "Oftalmologia",
-  "Ginecologia e Obstetrícia",
-  "Ortopedia e Traumatologia",
-  "Neurologia",
-  "Psiquiatria",
-  "Endocrinologia e Metabologia",
-  "Gastroenterologia",
-  "Urologia",
-  "Otorrinolaringologia",
-  "Reumatologia",
-  "Pneumologia",
-  "Nefrologia",
-  "Infectologia",
-  "Oncologia"
+  "Clínico Geral", "Pediatria", "Dermatologia", "Cardiologia", "Oftalmologia",
+  "Ginecologia e Obstetrícia", "Ortopedia e Traumatologia", "Neurologia", "Psiquiatria",
+  "Endocrinologia e Metabologia", "Gastroenterologia", "Urologia", "Otorrinolaringologia",
+  "Reumatologia", "Pneumologia", "Nefrologia", "Infectologia", "Oncologia"
 ];
 
-const formAgendamento = document.getElementById("formAgendamento");
-  const selectPaciente = document.getElementById("nomePaciente");
-  const dataConsultaInput = document.getElementById("dataConsulta");
-  const selectEspecialidade = document.getElementById("especialidade");
+const perfil = localStorage.getItem("perfil") || "comum";
 
-  if (formAgendamento && selectPaciente && dataConsultaInput && selectEspecialidade) {
-    especialidades.forEach((especialidade) => {
-      const option = document.createElement("option");
-      option.value = especialidade;
-      option.textContent = especialidade;
-      selectEspecialidade.appendChild(option);
-    });
+const formAgendamento     = document.getElementById("formAgendamento");
+const selectPaciente      = document.getElementById("nomePaciente");
+const dataConsultaInput   = document.getElementById("dataConsulta");
+const selectEspecialidade = document.getElementById("especialidade");
+const msg                 = document.getElementById("mensagemAgendamento");
 
-    const today = new Date().toISOString().split("T")[0];
-    dataConsultaInput.setAttribute("min", today);
+if (formAgendamento && selectPaciente && dataConsultaInput && selectEspecialidade) {
+  // Popula especialidades
+  especialidades.forEach(e => selectEspecialidade.add(new Option(e, e)));
 
-    const pacientesSalvos = JSON.parse(localStorage.getItem("pacientes")) || [];
-    pacientesSalvos.forEach((p) => {
-      const option = document.createElement("option");
-      option.value = p.nome;
-      option.textContent = p.nome;
-      selectPaciente.appendChild(option);
-    });
+  // Data mínima = hoje
+  dataConsultaInput.min = new Date().toISOString().split("T")[0];
 
-    formAgendamento.addEventListener("submit", function (e) {
-      e.preventDefault();
+  // Popula pacientes
+  (JSON.parse(localStorage.getItem("usuarios")) || [])
+    .filter(p => p.tipoUsuario === "Paciente")
+    .forEach(p => selectPaciente.add(new Option(p.nome, p.nome)));
 
-      const novaConsulta = {
-        paciente: document.getElementById("nomePaciente").value,
-        especialidade: document.getElementById("especialidade").value,
-        data: document.getElementById("dataConsulta").value,
-        hora: document.getElementById("horaConsulta").value,
-      };
+  formAgendamento.addEventListener("submit", e => {
+    e.preventDefault();
 
-      const consultas = JSON.parse(localStorage.getItem("consultas")) || [];
-      consultas.push(novaConsulta);
-      localStorage.setItem("consultas", JSON.stringify(consultas));
+    const novaConsulta = {
+      paciente: selectPaciente.value,
+      especialidade: selectEspecialidade.value,
+      data: dataConsultaInput.value,
+      hora: document.getElementById("horaConsulta").value,
+    };
 
-      const msg = document.getElementById("mensagemAgendamento");
-      msg.textContent = "Consulta agendada com sucesso!";
-      msg.classList.add("success");
+    const consultas = JSON.parse(localStorage.getItem("consultas")) || [];
+    consultas.push(novaConsulta);
+    localStorage.setItem("consultas", JSON.stringify(consultas));
 
-      this.reset();
+    msg.textContent = "Consulta agendada com sucesso!";
+    msg.className = "success";
 
-      setTimeout(() => {
-        msg.textContent = "";
-      }, 4000);
-    });
-  }
+    formAgendamento.reset();
+    setTimeout(() => msg.textContent = "", 4000);
+  });
+}

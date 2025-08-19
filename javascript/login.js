@@ -1,45 +1,15 @@
-// Usuários fictícios para login
-const fakeUsers = [
-  {
-    username: "admin",
-    password: "123456",
-    nome: "admin",
-    funcao: "Administrador",
-  },
-  {
-    username: "emanuel.nascimento",
-    password: "1234",
-    nome: "Emanuel Nogueira do Nascimento",
-    funcao: "Administrador",
-  },
-  {
-    username: "maria.silva",
-    password: "maria2025",
-    nome: "Maria da Silva",
-    funcao: "Enfermeiro(a)",
-  },
-  {
-    username: "jessica.silva",
-    password: "jessica2025",
-    nome: "Jessica da Silva",
-    funcao: "Enfermeiro(a)",
-  },
-  {
-    username: "claudia.gomes",
-    password: "claudia2025",
-    nome: "Claudia Gomes",
-    funcao: "Enfermeiro(a)",
-  },
-  {
-    username: "rodrigo.santos",
-    password: "rodrigo2025",
-    nome: "Rodrigo Santos",
-    funcao: "Enfermeiro(a)",
-  },
-];
+// Gera senha aleatória
+const gerarSenhaAleatoria = (tamanho = 6) =>
+  Array.from({ length: tamanho }, () =>
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      .charAt(Math.floor(Math.random() * 62))
+  ).join("");
 
+// Formata data para dd/mm/yyyy
+const formatarDataBR = (dataISO) =>
+  dataISO.split("-").reverse().join("/");
 
-// Função para popular dados fictícios no localStorage
+// Popula dados fictícios
 function popularDadosFicticios() {
   const nomesFake = [
     "Ana Souza", "Bruno Lima", "Carla Menezes", "Daniel Rocha", "Eduarda Castro",
@@ -49,70 +19,61 @@ function popularDadosFicticios() {
     "Rafael Mendes", "Simone Carvalho", "Thiago Araújo",
   ];
 
-  const pacientes = [];
-  const consultas = [];
   const hoje = new Date();
-
-  nomesFake.forEach((nome, index) => {
-    const nascimentoISO = `199${index % 10}-0${(index % 9) + 1}-15`;
-    const paciente = {
-      nome: nome,
-      cpf: String(10000000000 + index).padStart(11, '0'),
+  const usuarios = nomesFake.map((nome, i) => {
+    const nascimentoISO = `199${i % 10}-0${(i % 9) + 1}-15`;
+    return {
+      nome,
+      cpf: String(10000000000 + i).padStart(11, "0"),
       nascimento: nascimentoISO,
-      email: nome.toLowerCase().replace(" ", ".") + "@fic-email.com",
-      telefone: `2199${index.toString().padStart(6, "0")}`,
+      email: nome.toLowerCase().replace(/\s+/g, ".") + "@fic-email.com",
+      telefone: `2199${i.toString().padStart(6, "0")}`,
+      senha: gerarSenhaAleatoria(),
+      tipoUsuario: "Paciente"
     };
-    pacientes.push(paciente);
-
-    const dataConsulta = new Date(hoje);
-    dataConsulta.setDate(hoje.getDate() + index + 1);
-    const dataFormatada = formatarDataBR(dataConsulta.toISOString().split("T")[0]);
-
-    const consulta = {
-      paciente: nome,
-      especialidade: especialidades[index % especialidades.length],
-      data: dataFormatada,
-      hora: "10:00",
-    };
-    consultas.push(consulta);
   });
 
-  localStorage.setItem("pacientes", JSON.stringify(pacientes));
+  const consultas = nomesFake.map((nome, i) => {
+    const dataConsulta = new Date(hoje);
+    dataConsulta.setDate(hoje.getDate() + i + 1);
+    return {
+      paciente: nome,
+      especialidade: especialidades[i % especialidades.length],
+      data: formatarDataBR(dataConsulta.toISOString().split("T")[0]),
+      hora: "10:00"
+    };
+  });
+
+  localStorage.setItem("usuarios", JSON.stringify(usuarios));
   localStorage.setItem("consultas", JSON.stringify(consultas));
-  console.log("Dados fictícios populados no localStorage.");
+  console.log("✅ Dados fictícios populados no localStorage.");
 }
 
+// Início
 document.addEventListener("DOMContentLoaded", () => {
   // LOGIN
   const loginForm = document.getElementById("loginForm");
   if (loginForm) {
-    loginForm.addEventListener("submit", function (e) {
+    loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
-
-      const usernameInput = document.getElementById("username").value;
-      const passwordInput = document.getElementById("password").value;
+      const cpf = document.getElementById("username").value;
+      const senha = document.getElementById("password").value;
       const errorMsg = document.getElementById("errorMsg");
 
-      const user = fakeUsers.find(
-        (u) => u.username === usernameInput && u.password === passwordInput
-      );
+      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+      const user = usuarios.find((u) => u.cpf === cpf && u.senha === senha);
 
       if (user) {
         errorMsg.textContent = "";
-        localStorage.setItem(
-          "perfil",
-          user.funcao === "Administrador" ||
-            user.funcao === "Médico" ||
-            user.funcao === "Enfermeiro(a)"
-            ? "admin"
-            : "comum"
-        );
+        localStorage.setItem("perfil", user.tipoUsuario);
         localStorage.setItem("nomeUsuario", user.nome);
         window.location.href = "dashboard.html";
-        
-        popularDadosFicticios();
       } else {
-        errorMsg.textContent = "Usuário ou senha inválidos.";
+        errorMsg.textContent = "CPF ou senha inválidos.";
       }
     });
-    }});
+  }
+
+  // Popula caso ainda não exista
+  if (!localStorage.getItem("usuarios")) popularDadosFicticios();
+});

@@ -1,129 +1,91 @@
-  const profissionais = JSON.parse(localStorage.getItem("profissionais")) || [];
-  const pacientes = JSON.parse(localStorage.getItem("pacientes")) || [];
-  const consultas = JSON.parse(localStorage.getItem("consultas")) || [];
-  const agendas = JSON.parse(localStorage.getItem("agendas")) || [];
+const usuarios   = JSON.parse(localStorage.getItem("usuarios"))   || [];
+let consultas    = JSON.parse(localStorage.getItem("consultas"))  || [];
+let agendas      = JSON.parse(localStorage.getItem("agendas"))    || [];
 
-  const medicoSelect = document.getElementById("medico");
-  const pacienteSelect = document.getElementById("paciente");
-  const consultaSelect = document.getElementById("consultaPaciente");
-  const dataInput = document.getElementById("dataAgenda");
-  const horaInput = document.getElementById("horaAgenda");
-  const lista = document.getElementById("listaAgendas");
+const perfil     = localStorage.getItem("perfil") || "comum";
 
-  // Carrega médicos
-  profissionais
-    .filter(p => p.tipo === "Médico")
-    .forEach(p => {
-      const opt = document.createElement("option");
-      opt.value = p.nome;
-      opt.textContent = p.nome;
-      medicoSelect.appendChild(opt);
-    });
+const medicoSelect   = document.getElementById("medico");
+const pacienteSelect = document.getElementById("paciente");
+const consultaSelect = document.getElementById("consultaPaciente");
+const dataInput      = document.getElementById("dataAgenda");
+const horaInput      = document.getElementById("horaAgenda");
+const lista          = document.getElementById("listaAgendas");
+const filtroMedicoInput = document.getElementById("filtroMedico");
 
-  // Carrega pacientes
-  pacientes.forEach(p => {
-    const opt = document.createElement("option");
-    opt.value = p.nome;
-    opt.textContent = p.nome;
-    pacienteSelect.appendChild(opt);
+// Função utilitária para popular <select>
+const popularSelect = (select, lista, filtroFn) => {
+  lista.filter(filtroFn).forEach(u => {
+    select.add(new Option(u.nome, u.nome));
   });
+};
 
-  // Ao selecionar paciente, carrega todas as consultas dele
-  pacienteSelect.addEventListener("change", () => {
-    consultaSelect.innerHTML = '<option value="">Selecione a consulta</option>';
-    const nomePaciente = pacienteSelect.value;
+// Carrega médicos e pacientes
+popularSelect(medicoSelect, usuarios, u => u.tipoUsuario === "Médico");
+popularSelect(pacienteSelect, usuarios, u => u.tipoUsuario === "Paciente");
 
-    const consultasDoPaciente = consultas.filter(c => c.paciente === nomePaciente);
+// Seleção de paciente -> carrega consultas
+pacienteSelect.addEventListener("change", () => {
+  consultaSelect.innerHTML = '<option value="">Selecione a consulta</option>';
+  const consultasDoPaciente = consultas.filter(c => c.paciente === pacienteSelect.value);
 
-    if (consultasDoPaciente.length === 0) {
-      alert("Este paciente não possui consultas cadastradas.");
-      return;
-    }
+  if (!consultasDoPaciente.length) return alert("Este paciente não possui consultas cadastradas.");
 
-    consultasDoPaciente.forEach((c, index) => {
-      const opt = document.createElement("option");
-      opt.value = index; // salvamos o índice para depois recuperar os dados
-      opt.textContent = `${c.data} às ${c.hora} - ${c.especialidade}`;
-      consultaSelect.appendChild(opt);
-    });
-  });
+  consultasDoPaciente.forEach((c, i) =>
+    consultaSelect.add(new Option(`${c.data} às ${c.hora} - ${c.especialidade}`, i))
+  );
+});
 
-  // Ao selecionar a consulta, preenche data e hora escondidos
-  consultaSelect.addEventListener("change", () => {
-    const nomePaciente = pacienteSelect.value;
-    const consultasDoPaciente = consultas.filter(c => c.paciente === nomePaciente);
-    const index = consultaSelect.value;
-
-    if (index !== "") {
-      const consultaSelecionada = consultasDoPaciente[index];
-      const [dia, mes, ano] = consultaSelecionada.data.split("/");
-      dataInput.value = `${ano}-${mes}-${dia}`; // formato AAAA-MM-DD
-      horaInput.value = consultaSelecionada.hora;
-    } else {
-      dataInput.value = "";
-      horaInput.value = "";
-    }
-  });
-
-  const filtroMedicoInput = document.getElementById("filtroMedico");
-
-  function renderAgendas() {
-    let agendasFiltradas = agendas;
-
-    if (filtroMedicoInput && filtroMedicoInput.value.trim() !== "") {
-      const filtro = filtroMedicoInput.value.trim().toLowerCase();
-      agendasFiltradas = agendas.filter(a =>
-        a.medico.toLowerCase().includes(filtro)
-      );
-    }
-
-    lista.innerHTML = "";
-
-    if (agendasFiltradas.length === 0) {
-      lista.innerHTML = '<li class="list-group-item">Nenhuma consulta agendada.</li>';
-      return;
-    }
-
-    agendasFiltradas.forEach((a, i) => {
-      const li = document.createElement("li");
-      li.className = "list-group-item d-flex justify-content-between";
-      li.innerHTML = `<span><strong>${a.paciente}</strong> com <strong>${a.medico}</strong><br>${a.data} às ${a.hora}</span>
-        <button class="btn btn-sm btn-danger" onclick="remover(${i})">Remover</button>`;
-      lista.appendChild(li);
-    });
+// Seleção de consulta -> preenche data/hora
+consultaSelect.addEventListener("change", () => {
+  const consulta = consultas.filter(c => c.paciente === pacienteSelect.value)[consultaSelect.value];
+  if (consulta) {
+    const [d, m, a] = consulta.data.split("/");
+    dataInput.value = `${a}-${m}-${d}`;
+    horaInput.value = consulta.hora;
+  } else {
+    dataInput.value = horaInput.value = "";
   }
+});
 
-  // Atualiza a lista ao digitar no filtro
-  if (filtroMedicoInput) {
-    filtroMedicoInput.addEventListener("input", renderAgendas);
-  }
+// Renderização das agendas
+function renderAgendas() {
+  const filtro = (filtroMedicoInput?.value || "").toLowerCase();
+  const agendasFiltradas = filtro ? agendas.filter(a => a.medico.toLowerCase().includes(filtro)) : agendas;
 
-  function remover(i) {
-    agendas.splice(i, 1);
-    localStorage.setItem("agendas", JSON.stringify(agendas));
-    renderAgendas();
-  }
+  lista.innerHTML = agendasFiltradas.length
+    ? agendasFiltradas.map((a, i) => `
+        <li class="list-group-item d-flex justify-content-between">
+          <span><strong>${a.paciente}</strong> com <strong>${a.medico}</strong><br>${a.data} às ${a.hora}</span>
+          <button class="btn btn-sm btn-danger" onclick="remover(${i})">Remover</button>
+        </li>
+      `).join("")
+    : '<li class="list-group-item">Nenhuma consulta agendada.</li>';
+}
 
-  document.getElementById("formAgenda").addEventListener("submit", e => {
-    e.preventDefault();
+filtroMedicoInput?.addEventListener("input", renderAgendas);
 
-    if (!dataInput.value || !horaInput.value) {
-      alert("Você precisa selecionar uma consulta válida.");
-      return;
-    }
-
-    const novaAgenda = {
-      medico: medicoSelect.value,
-      paciente: pacienteSelect.value,
-      data: dataInput.value,
-      hora: horaInput.value,
-    };
-
-    agendas.push(novaAgenda);
-    localStorage.setItem("agendas", JSON.stringify(agendas));
-    e.target.reset();
-    consultaSelect.innerHTML = '<option value="">Selecione a consulta</option>';
-    renderAgendas();
-  });
-
+function remover(i) {
+  agendas.splice(i, 1);
+  localStorage.setItem("agendas", JSON.stringify(agendas));
   renderAgendas();
+}
+
+// Submissão do formulário
+document.getElementById("formAgenda").addEventListener("submit", e => {
+  e.preventDefault();
+  if (!dataInput.value || !horaInput.value) return alert("Você precisa selecionar uma consulta válida.");
+
+  agendas.push({
+    medico: medicoSelect.value,
+    paciente: pacienteSelect.value,
+    data: dataInput.value,
+    hora: horaInput.value,
+  });
+
+  localStorage.setItem("agendas", JSON.stringify(agendas));
+  e.target.reset();
+  consultaSelect.innerHTML = '<option value="">Selecione a consulta</option>';
+  renderAgendas();
+});
+
+renderAgendas();
