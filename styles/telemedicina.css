@@ -1,0 +1,113 @@
+    .video-container {
+      position: relative;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      min-height: 400px;
+    }
+    
+    .video-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(45deg, #1a1a1a, #333);
+      color: white;
+      font-size: 1.2rem;
+    }
+    
+    .video-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 10px;
+      border-radius: 25px;
+    }
+    
+    .control-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .control-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .control-btn.primary {
+      background: #007bff;
+    }
+    
+    .control-btn.danger {
+      background: #dc3545;
+    }
+    
+    .control-btn.success {
+      background: #28a745;
+    }
+    
+    .control-btn.warning {
+      background: #ffc107;
+      color: #000;
+    }
+    
+    .chat-container {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      padding: 15px;
+      background: #f8f9fa;
+    }
+    
+    .chat-message {
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 15px;
+      max-width: 70%;
+    }
+    
+    .chat-message.medico {
+      background: #007bff;
+      color: white;
+      margin-left: auto;
+      text-align: right;
+    }
+    
+    .chat-message.paciente {
+      background: #e9ecef;
+      color: #000;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    
+    .status-online {
+      background: #28a745;
+    }
+    
+    .status-offline {
+      background: #dc3545;
+    }
+    
+    .status-aguardando {
+      background: #ffc107;
+    }

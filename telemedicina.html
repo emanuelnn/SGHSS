@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SGHSS - Telemedicina</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles/telemedicina.css"/>
+  <link rel="stylesheet" href="styles/main.css"/>
+</head>
+<body class="telemedicina-container">
+  <div class="container mt-5">
+    <div class="card p-4 shadow">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+          <i class="fas fa-video"></i>Telemedicina
+        </h2>
+        <a href="dashboard.html" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-1"></i>Voltar ao Menu
+        </a>
+      </div>
+
+      <ul class="nav nav-tabs" id="telemedicinaTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="agendarTele-tab" data-bs-toggle="tab" data-bs-target="#agendarTele" type="button" role="tab">
+            <i class="fas fa-calendar-plus me-1"></i>Agendar Teleconsulta
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="consultasTele-tab" data-bs-toggle="tab" data-bs-target="#consultasTele" type="button" role="tab">
+            <i class="fas fa-list me-1"></i>Minhas Consultas
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="emAndamento-tab" data-bs-toggle="tab" data-bs-target="#emAndamento" type="button" role="tab">
+            <i class="fas fa-play-circle me-1"></i>Consulta em Andamento
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content mt-3">
+        <div class="tab-pane fade show active" id="agendarTele" role="tabpanel">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">Dados da Consulta</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label">Paciente</label>
+                    <select id="pacienteTele" class="form-select" required>
+                      <option value="">Selecione o paciente</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Médico</label>
+                    <select id="medicoTele" class="form-select" required>
+                      <option value="">Selecione o médico</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Especialidade</label>
+                    <input type="text" id="especialidadeTele" class="form-control" readonly>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Data da Consulta</label>
+                    <input type="date" id="dataTele" class="form-control" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Horário</label>
+                    <select id="horarioTele" class="form-select" required>
+                      <option value="">Selecione o horário</option>
+                      <option value="08:00">08:00</option>
+                      <option value="09:00">09:00</option>
+                      <option value="10:00">10:00</option>
+                      <option value="11:00">11:00</option>
+                      <option value="14:00">14:00</option>
+                      <option value="15:00">15:00</option>
+                      <option value="16:00">16:00</option>
+                      <option value="17:00">17:00</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Motivo da Consulta</label>
+                    <textarea id="motivoTele" class="form-control" rows="3" placeholder="Descreva o motivo da consulta"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">Instruções</h6>
+                </div>
+                <div class="card-body">
+                  <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle me-2"></i>Preparação para Teleconsulta</h6>
+                    <ul class="mb-0">
+                      <li>Verifique sua conexão de internet</li>
+                      <li>Teste sua câmera e microfone</li>
+                      <li>Escolha um local tranquilo e bem iluminado</li>
+                      <li>Tenha documentos e exames à mão</li>
+                      <li>Chegue 10 minutos antes do horário</li>
+                    </ul>
+                  </div>
+                  <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>Atenção</h6>
+                    <p class="mb-0">Em caso de emergência, ligue imediatamente para 192 ou procure uma unidade de saúde.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center mt-3">
+            <button type="button" class="btn btn-success" onclick="agendarTeleconsulta()">
+              <i class="fas fa-calendar-check me-1"></i>Agendar Teleconsulta
+            </button>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="consultasTele" role="tabpanel">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">Filtros</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <select id="filtroStatus" class="form-select">
+                      <option value="">Todos</option>
+                      <option value="Agendada">Agendada</option>
+                      <option value="Em Andamento">Em Andamento</option>
+                      <option value="Concluída">Concluída</option>
+                      <option value="Cancelada">Cancelada</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Período</label>
+                    <select id="filtroPeriodo" class="form-select">
+                      <option value="7">Últimos 7 dias</option>
+                      <option value="30">Últimos 30 dias</option>
+                      <option value="90">Últimos 90 dias</option>
+                      <option value="todos">Todos</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-primary w-100" onclick="filtrarConsultas()">
+                    <i class="fas fa-filter me-1"></i>Filtrar
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">Histórico de Teleconsultas</h6>
+                </div>
+                <div class="card-body">
+                  <div id="listaConsultas" style="max-height: 500px; overflow-y: auto;">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="emAndamento" role="tabpanel">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="video-container">
+                <div id="videoArea" class="video-placeholder">
+                  <div class="text-center">
+                    <i class="fas fa-video-slash fa-3x mb-3"></i>
+                    <p>Clique em "Iniciar Consulta" para começar</p>
+                  </div>
+                </div>
+                <div class="video-controls">
+                  <button class="control-btn success" id="startBtn" onclick="iniciarConsulta()">
+                    <i class="fas fa-play"></i>
+                  </button>
+                  <button class="control-btn danger" id="stopBtn" onclick="pararConsulta()" style="display: none;">
+                    <i class="fas fa-stop"></i>
+                  </button>
+                  <button class="control-btn warning" id="muteBtn" onclick="alternarMute()" style="display: none;">
+                    <i class="fas fa-microphone"></i>
+                  </button>
+                  <button class="control-btn warning" id="videoBtn" onclick="alternarVideo()" style="display: none;">
+                    <i class="fas fa-video"></i>
+                  </button>
+                  <button class="control-btn primary" id="shareBtn" onclick="compartilharTela()" style="display: none;">
+                    <i class="fas fa-desktop"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card mb-3">
+                <div class="card-header">
+                  <h6 class="mb-0">Informações da Consulta</h6>
+                </div>
+                <div class="card-body">
+                  <div id="infoConsulta">
+                    <div class="text-center text-muted">
+                      <i class="fas fa-info-circle fa-2x mb-2"></i>
+                      <p>Nenhuma consulta em andamento</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">Chat</h6>
+                </div>
+                <div class="card-body">
+                  <div id="chatArea" class="chat-container mb-3">
+                    <div class="text-center text-muted">
+                      <small>Inicie a consulta para usar o chat</small>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <input type="text" id="chatInput" class="form-control" placeholder="Digite sua mensagem..." disabled>
+                    <button class="btn btn-primary" id="sendBtn" onclick="enviarMensagem()" disabled>
+                      <i class="fas fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mt-3">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">Prontuário da Consulta</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label class="form-label">Sintomas Relatados</label>
+                        <textarea id="sintomas" class="form-control" rows="3" placeholder="Descreva os sintomas do paciente"></textarea>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label class="form-label">Diagnóstico Preliminar</label>
+                        <textarea id="diagnostico" class="form-control" rows="3" placeholder="Diagnóstico preliminar"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Recomendações</label>
+                    <textarea id="recomendacoes" class="form-control" rows="3" placeholder="Recomendações para o paciente"></textarea>
+                  </div>
+                  <div class="text-end">
+                    <button type="button" class="btn btn-success" onclick="finalizarConsulta()">
+                      <i class="fas fa-check me-1"></i>Finalizar Consulta
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <a href="dashboard.html" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-1"></i>Voltar ao Menu Principal
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/javascript/telemedicina.js"></script>
+</body>
+</html>
