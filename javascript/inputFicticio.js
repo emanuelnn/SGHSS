@@ -253,7 +253,7 @@ function gerarExames() {
 function gerarLeitos() {
   const leitos = [];
   const tiposLeito = ["Comum", "UTI", "UTI Neonatal", "UTI Pediátrica", "Enfermaria", "Apartamento"];
-  const statusLeito = ["Ocupado", "Livre", "Manutenção", "Limpeza"];
+  const statusLeito = ["Ocupado", "Livre", "Manutenção"];
   
   for (let andar = 1; andar <= 6; andar++) {
     for (let quarto = 1; quarto <= 20; quarto++) {

@@ -1,4 +1,4 @@
-const canvasGraficoPizza = document.getElementById('graficoPizza');
+  const canvasGraficoPizza = document.getElementById('graficoPizza');
 
   if (canvasGraficoPizza) {
 
@@ -8,14 +8,11 @@ const canvasGraficoPizza = document.getElementById('graficoPizza');
 
     const consultasParaGrafico = JSON.parse(localStorage.getItem("consultas")) || [];
     const hojeParaGrafico = new Date();
+    const hojeSemTempo = new Date(hojeParaGrafico.getFullYear(), hojeParaGrafico.getMonth(), hojeParaGrafico.getDate());
     const especialidadesContagem = {};
 
     consultasParaGrafico.forEach(c => {
-      const [diaStr, mesStr, anoStr] = c.data.split('/');
-
-      const dataConsulta = new Date(parseInt(anoStr), parseInt(mesStr) - 1, parseInt(diaStr));
-
-      const hojeSemTempo = new Date(hojeParaGrafico.getFullYear(), hojeParaGrafico.getMonth(), hojeParaGrafico.getDate());
+      const dataConsulta = new Date(c.data); // agora pega direto do formato ISO
 
       if (dataConsulta >= hojeSemTempo) {
         if (especialidadesContagem[c.especialidade]) {
@@ -70,57 +67,50 @@ const canvasGraficoPizza = document.getElementById('graficoPizza');
         }
       }
     });
-  };
+  }
 
-  // Toggle sidebar for mobile
+
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('show');
     }
     
-    // Initialize dashboard
     document.addEventListener('DOMContentLoaded', function() {
       updateMetrics();
       updateRecentActivities();
     });
     
-    // Update metrics
     function updateMetrics() {
-      // Get data from localStorage
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-      const consultas = JSON.parse(localStorage.getItem('consultas')) || [];
-      const leitos = JSON.parse(localStorage.getItem('leitos')) || [];
-      
-      // Calculate metrics
-      const pacientes = usuarios.filter(u => u.tipoUsuario === 'Paciente').length;
-      const medicos = usuarios.filter(u => u.tipoUsuario === 'Médico').length;
-      
-      const hoje = new Date();
-      const hojeSemTempo = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-      const consultasFuturas = consultas.filter(c => {
-        const [dia, mes, ano] = c.data.split('/');
-        const dataConsulta = new Date(ano, mes - 1, dia);
-        return dataConsulta >= hojeSemTempo;
-      }).length;
-      
-      const leitosOcupados = leitos.filter(l => l.status === 'ocupado').length;
-      
-      // Update DOM
-      document.getElementById('totalPacientes').textContent = pacientes;
-      document.getElementById('totalMedicos').textContent = medicos;
-      document.getElementById('consultasFuturas').textContent = consultasFuturas;
-      document.getElementById('leitosOcupados').textContent = leitosOcupados;
-    }
+  const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+  const consultas = JSON.parse(localStorage.getItem('consultas')) || [];
+  const leitos = JSON.parse(localStorage.getItem('leitos')) || [];
+
+  const pacientes = usuarios.filter(u => u.tipoUsuario === 'Paciente').length;
+  const medicos = usuarios.filter(u => u.tipoUsuario === 'Médico').length;
+
+  const hoje = new Date();
+  const hojeSemTempo = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+
+  const consultasFuturas = consultas.filter(c => {
+    const dataConsulta = new Date(c.data);
+    return dataConsulta >= hojeSemTempo;
+  }).length;
+
+  const leitosOcupados = leitos.filter(l => l.status === 'ocupado').length;
+
+  document.getElementById('totalPacientes').textContent = pacientes;
+  document.getElementById('totalMedicos').textContent = medicos;
+  document.getElementById('consultasFuturas').textContent = consultasFuturas;
+  document.getElementById('leitosOcupados').textContent = leitosOcupados;
+}
+
     
-    // Update recent activities
     function updateRecentActivities() {
       const activities = [];
       
-      // Get recent data
       const consultas = JSON.parse(localStorage.getItem('consultas')) || [];
       const prescricoes = JSON.parse(localStorage.getItem('prescricoes')) || [];
       const leitos = JSON.parse(localStorage.getItem('leitos')) || [];
       
-      // Add recent consultations
       consultas.slice(-3).forEach(c => {
         activities.push({
           title: `Consulta agendada: ${c.paciente} - ${c.especialidade}`,
@@ -130,7 +120,6 @@ const canvasGraficoPizza = document.getElementById('graficoPizza');
         });
       });
       
-      // Add recent prescriptions
       prescricoes.slice(-2).forEach(p => {
         activities.push({
           title: `Nova prescrição para: ${p.paciente}`,
@@ -140,7 +129,6 @@ const canvasGraficoPizza = document.getElementById('graficoPizza');
         });
       });
       
-      // Add recent bed changes
       leitos.filter(l => l.status === 'ocupado').slice(-2).forEach(l => {
         activities.push({
           title: `Leito ocupado: ${l.numero} - ${l.paciente}`,
@@ -150,13 +138,10 @@ const canvasGraficoPizza = document.getElementById('graficoPizza');
         });
       });
       
-      // Sort activities by time (most recent first)
       activities.sort((a, b) => new Date(b.time) - new Date(a.time));
       
-      // Limit to 5 activities
       const recentActivities = activities.slice(0, 5);
       
-      // Populate DOM
       const container = document.getElementById('recentActivities');
       container.innerHTML = recentActivities.map(activity => `
         <div class="activity-item">

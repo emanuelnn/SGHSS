@@ -16,22 +16,21 @@ document.addEventListener("DOMContentLoaded", () => {
   popularSelects();
   renderPacientes();
   renderConsultas();
-  
-  // Event listeners
+ 
   document.getElementById("filtroPaciente")?.addEventListener("input", renderPacientes);
   document.getElementById("filtroTipo")?.addEventListener("change", renderPacientes);
   document.getElementById("filtroConsulta")?.addEventListener("input", renderConsultas);
   document.getElementById("filtroStatus")?.addEventListener("change", renderConsultas);
   document.getElementById("filtroEspecialidade")?.addEventListener("change", renderConsultas);
   
-  // Data mínima = hoje
+  // Data não pode ser menor que a atual
   const hoje = new Date().toISOString().split("T")[0];
   document.getElementById("dataConsulta")?.setAttribute("min", hoje);
 });
 
 // Popular selects
 function popularSelects() {
-  // Popular pacientes
+  //pacientes
   const selectPaciente = document.getElementById("nomePaciente");
   if (selectPaciente) {
     selectPaciente.innerHTML = '<option value="">Selecione o paciente</option>';
@@ -44,7 +43,7 @@ function popularSelects() {
     });
   }
   
-  // Popular especialidades
+  //especialidades
   const selectEspecialidade = document.getElementById("especialidade");
   if (selectEspecialidade) {
     selectEspecialidade.innerHTML = '<option value="">Selecione a especialidade</option>';
@@ -56,7 +55,7 @@ function popularSelects() {
     });
   }
 
-  // Popular médicos
+  //médicos
   const selectMedico = document.getElementById("medico");
   if (selectMedico) {
     selectMedico.innerHTML = '<option value="">Selecione o médico</option>';
@@ -69,7 +68,7 @@ function popularSelects() {
     });
   }
   
-  // Popular horários
+  //horários
   const selectHora = document.getElementById("horaConsulta");
   if (selectHora) {
     selectHora.innerHTML = '<option value="">Selecione o horário</option>';
@@ -82,7 +81,7 @@ function popularSelects() {
     });
   }
   
-  // Popular filtro especialidade
+  //filtro especialidade
   const filtroEspecialidade = document.getElementById("filtroEspecialidade");
   if (filtroEspecialidade) {
     filtroEspecialidade.innerHTML = '<option value="">Todas as especialidades</option>';
@@ -112,7 +111,6 @@ function agendarConsulta() {
     return;
   }
   
-  // Verificar restrições de perfil
   if (perfil === "Paciente") {
     // Pacientes só podem agendar para si mesmos
     if (paciente !== nomeUsuario) {
@@ -138,7 +136,6 @@ function agendarConsulta() {
   consultas.push(novaConsulta);
   localStorage.setItem("consultas", JSON.stringify(consultas));
   
-  // Mostrar mensagem de sucesso
   const mensagem = document.getElementById("mensagemAgendamento");
   if (mensagem) {
     mensagem.className = "alert alert-success alert-dismissible fade show";
@@ -149,7 +146,6 @@ function agendarConsulta() {
     `;
   }
   
-  // Limpar formulário
   document.getElementById("nomePaciente").value = "";
   document.getElementById("especialidade").value = "";
   document.getElementById("dataConsulta").value = "";
@@ -159,11 +155,9 @@ function agendarConsulta() {
   document.getElementById("motivoConsulta").value = "";
   document.getElementById("observacoes").value = "";
   
-  // Atualizar listas
   renderConsultas();
 }
 
-// Renderizar pacientes
 function renderPacientes() {
   const lista = document.getElementById("pacienteList");
   if (!lista) return;
@@ -225,7 +219,6 @@ function renderPacientes() {
   });
 }
 
-// Renderizar consultas
 function renderConsultas() {
   const lista = document.getElementById("consultaList");
   if (!lista) return;
@@ -326,7 +319,7 @@ function renderConsultas() {
   });
 }
 
-// Ver detalhes do paciente
+//detalhes do paciente
 function verDetalhesPaciente(nome) {
   const paciente = usuarios.find(u => u.nome === nome);
   if (!paciente) return;
@@ -343,7 +336,7 @@ function removerPaciente(nome) {
     return;
   }
   
-  // Remover paciente e suas consultas
+  // Remover paciente e consultas vinculadas
   usuarios = usuarios.filter(u => u.nome !== nome);
   consultas = consultas.filter(c => c.paciente !== nome);
   
@@ -430,14 +423,11 @@ function editarConsulta(id) {
   consultas = consultas.filter(c => c.id !== id);
   localStorage.setItem("consultas", JSON.stringify(consultas));
   
-  // Fechar modal
   bootstrap.Modal.getInstance(document.getElementById("modalConsulta")).hide();
   
-  // Mudar para aba de agendamento
   const agendarTab = new bootstrap.Tab(document.getElementById("agendar-tab"));
   agendarTab.show();
   
-  // Rolar para o formulário
   document.getElementById("agendar").scrollIntoView({ behavior: 'smooth' });
 }
 

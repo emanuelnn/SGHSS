@@ -10,7 +10,7 @@ const btnSalvar = document.getElementById("btnSalvar");
 // Verificar permissões de acesso
 function verificarPermissoes() {
   const ehAdministrador = perfil === "Administrador";
- 
+
   // Restringir acesso ao formulário de cadastro
   if (!ehAdministrador) {
     if (formCadastro) {
@@ -23,8 +23,7 @@ function verificarPermissoes() {
       btnSalvar.style.display = "none";
     }
   }
-  
-  // Permitir visualização da lista para todos
+
   return true;
 }
 
@@ -86,8 +85,7 @@ window.removerUsuario = function(index) {
   usuarios.splice(index, 1);
   localStorage.setItem("usuarios", JSON.stringify(usuarios));
   renderUsuarios();
-  
-  // Mostrar mensagem de sucesso
+
   const msg = document.getElementById("mensagemCadastro");
   if (msg) {
     msg.className = "alert alert-success";
@@ -158,7 +156,6 @@ if (formCadastro) {
   });
 }
 
-// Inicialização
 document.addEventListener("DOMContentLoaded", () => {
   verificarPermissoes();
   renderUsuarios();
