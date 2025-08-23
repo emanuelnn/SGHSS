@@ -25,7 +25,7 @@
         <div class="estatistica-icon">
           <i class="fas fa-boxes"></i>
         </div>
-        <div class="estatistica-valor">156</div>
+        <div class="estatistica-valor" id ="totalProdutos">0</div>
         <div class="estatistica-label">Total de Produtos</div>
       </div>
      
@@ -33,7 +33,7 @@
         <div class="estatistica-icon">
           <i class="fas fa-check-circle"></i>
         </div>
-        <div class="estatistica-valor">89</div>
+        <div class="estatistica-valor" id="totalEstoque">0</div>
         <div class="estatistica-label">Em Estoque</div>
       </div>
       
@@ -41,7 +41,7 @@
         <div class="estatistica-icon">
           <i class="fas fa-exclamation-triangle"></i>
         </div>
-        <div class="estatistica-valor">45</div>
+        <div class="estatistica-valor" id = "baixoEstoque">0</div>
         <div class="estatistica-label">Estoque Baixo</div>
       </div>
       
@@ -49,7 +49,7 @@
         <div class="estatistica-icon">
           <i class="fas fa-times-circle"></i>
         </div>
-        <div class="estatistica-valor">22</div>
+        <div class="estatistica-valor" id = "emFalta">0</div>
         <div class="estatistica-label">Em Falta</div>
       </div>
     </div>
@@ -69,7 +69,7 @@
             <option value="administrativo">Material Administrativo</option>
           </select>
         </div>
-        
+       
         <div class="filtro-group">
           <label class="filtro-label">Status</label>
           <select class="filtro-select">
@@ -93,125 +93,12 @@
       </div>
     </div>
 
-    <div class="produtos-grid">
-      <div class="produto-card saude">
-        <div class="produto-header">
-          <h6 class="produto-nome">Seringas Descartáveis 3ml</h6>
-          <span class="produto-categoria categoria-medico">Médico</span>
-        </div>
-
-        <div class="produto-info">
-          <p><i class="fas fa-barcode"></i> Código: SER-003</p>
-          <p><i class="fas fa-cubes"></i> Quantidade: 250 unidades</p>
-          <p><i class="fas fa-warehouse"></i> Local: Armazém A - Prateleira 3</p>
-        </div>
-
-        <div class="produto-estoque">
-          <label class="estoque-label">Nível de Estoque</label>
-          <div class="estoque-bar">
-            <div class="estoque-fill estoque-saude" style="width: 85%"></div>
-          </div>
-          <span class="estoque-status status-saude">Estoque Saudável</span>
-        </div>
-      </div>
-
-      <div class="produto-card atencao">
-        <div class="produto-header">
-          <h6 class="produto-nome">Luvas de Latex Tamanho M</h6>
-          <span class="produto-categoria categoria-enfermagem">Enfermagem</span>
-        </div>
-
-        <div class="produto-info">
-          <p><i class="fas fa-barcode"></i> Código: LUV-MED</p>
-          <p><i class="fas fa-cubes"></i> Quantidade: 45 caixas</p>
-          <p><i class="fas fa-warehouse"></i> Local: Enfermagem - Gaveta 2</p>
-        </div>
-
-        <div class="produto-estoque">
-          <label class="estoque-label">Nível de Estoque</label>
-          <div class="estoque-bar">
-            <div class="estoque-fill estoque-atencao" style="width: 25%"></div>
-          </div>
-          <span class="estoque-status status-atencao">Estoque Baixo</span>
-        </div>
-      </div>
-
-      <div class="produto-card critico">
-        <div class="produto-header">
-          <h6 class="produto-nome">Água Destilada 500ml</h6>
-          <span class="produto-categoria categoria-laboratorio">Laboratório</span>
-        </div>
-
-        <div class="produto-info">
-          <p><i class="fas fa-barcode"></i> Código: AGU-500</p>
-          <p><i class="fas fa-cubes"></i> Quantidade: 5 unidades</p>
-          <p><i class="fas fa-warehouse"></i> Local: Laboratório - Freezer 1</p>
-        </div>
-
-        <div class="produto-estoque">
-          <label class="estoque-label">Nível de Estoque</label>
-          <div class="estoque-bar">
-            <div class="estoque-fill estoque-critico" style="width: 5%"></div>
-          </div>
-          <span class="estoque-status status-critico">Em Falta</span>
-        </div>
-
-      </div>
-      <div class="produto-card saude">
-        <div class="produto-header">
-          <h6 class="produto-nome">Máscaras Cirúrgicas</h6>
-          <span class="produto-categoria categoria-medico">Médico</span>
-        </div>
-        <div class="produto-info">
-          <p><i class="fas fa-barcode"></i> Código: MSC-CIR</p>
-          <p><i class="fas fa-cubes"></i> Quantidade: 180 unidades</p>
-          <p><i class="fas fa-warehouse"></i> Local: Armazém B - Prateleira 1</p>
-        </div>
-        <div class="produto-estoque">
-          <label class="estoque-label">Nível de Estoque</label>
-          <div class="estoque-bar">
-            <div class="estoque-fill estoque-saude" style="width: 72%"></div>
-          </div>
-          <span class="estoque-status status-saude">Estoque Saudável</span>
-        </div>
-      </div>
-      <div class="produto-card atencao">
-        <div class="produto-header">
-          <h6 class="produto-nome">Algodão Estéril</h6>
-          <span class="produto-categoria categoria-enfermagem">Enfermagem</span>
-        </div>
-        <div class="produto-info">
-          <p><i class="fas fa-barcode"></i> Código: ALG-EST</p>
-          <p><i class="fas fa-cubes"></i> Quantidade: 30 pacotes</p>
-          <p><i class="fas fa-warehouse"></i> Local: Enfermagem - Gaveta 5</p>
-        </div>
-        <div class="produto-estoque">
-          <label class="estoque-label">Nível de Estoque</label>
-          <div class="estoque-bar">
-            <div class="estoque-fill estoque-atencao" style="width: 30%"></div>
-          </div>
-          <span class="estoque-status status-atencao">Estoque Baixo</span>
-        </div>
-      </div>
-      <div class="produto-card saude">
-        <div class="produto-header">
-          <h6 class="produto-nome">Termômetros Digitais</h6>
-          <span class="produto-categoria categoria-medico">Médico</span>
-        </div>
-        <div class="produto-info">
-          <p><i class="fas fa-barcode"></i> Código: TER-DIG</p>
-          <p><i class="fas fa-cubes"></i> Quantidade: 25 unidades</p>
-          <p><i class="fas fa-warehouse"></i> Local: Consultório - Gaveta 3</p>
-        </div>
-        <div class="produto-estoque">
-          <label class="estoque-label">Nível de Estoque</label>
-          <div class="estoque-bar">
-            <div class="estoque-fill estoque-saude" style="width: 95%"></div>
-          </div>
-          <span class="estoque-status status-saude">Estoque Saudável</span>
-        </div>
+    <div class="text-center mt-4">
+      <div class="produtos-grid" id ="estoqueGrid">
+        <!-- Cards de produtos serão inseridos aqui via JavaScript -->
       </div>
     </div>
+
     <div class="text-center mt-4">
       <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#novoProdutoModal">
         <i class="fas fa-plus me-2"></i>Novo Produto
@@ -219,121 +106,6 @@
       <button class="btn btn-success me-2">
         <i class="fas fa-download me-2"></i>Exportar Relatório
       </button>
-    </div>
-  </div>
-  <div class="modal fade" id="detalhesProdutoModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Detalhes do Produto</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="detalhes-grid">
-            <div class="detalhes-card">
-              <h6>Informações Gerais</h6>
-              <table class="detalhes-table">
-                <tr>
-                  <td>Nome:</td>
-                  <td>Seringas Descartáveis 3ml</td>
-                </tr>
-                <tr>
-                  <td>Código:</td>
-                  <td>SER-003</td>
-                </tr>
-                <tr>
-                  <td>Categoria:</td>
-                  <td>Material Médico</td>
-                </tr>
-                <tr>
-                  <td>Fornecedor:</td>
-                  <td>MediSuprimentos Ltda</td>
-                </tr>
-                <tr>
-                  <td>Preço Unitário:</td>
-                  <td>R$ 0,85</td>
-                </tr>
-              </table>
-            </div>
-            <div class="detalhes-card">
-              <h6>Estoque Atual</h6>
-              <table class="detalhes-table">
-                <tr>
-                  <td>Quantidade:</td>
-                  <td>250 unidades</td>
-                </tr>
-                <tr>
-                  <td>Estoque Mínimo:</td>
-                  <td>50 unidades</td>
-                </tr>
-                <tr>
-                  <td>Estoque Máximo:</td>
-                  <td>500 unidades</td>
-                </tr>
-                <tr>
-                  <td>Status:</td>
-                  <td><span class="badge bg-success">Estoque Saudável</span></td>
-                </tr>
-                <tr>
-                  <td>Localização:</td>
-                  <td>Armazém A - Prateleira 3</td>
-                </tr>
-              </table>
-            </div>
-          </div>
-          <div class="detalhes-card">
-            <h6>Movimentações Recentes</h6>
-            <div class="table-responsive">
-              <table class="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Data</th>
-                    <th>Tipo</th>
-                    <th>Quantidade</th>
-                    <th>Responsável</th>
-                    <th>Observações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>15/01/2024</td>
-                    <td><span class="badge bg-success">Entrada</span></td>
-                    <td>+100</td>
-                    <td>Enf. Maria Silva</td>
-                    <td>Recebimento de fornecedor</td>
-                  </tr>
-                  <tr>
-                    <td>10/01/2024</td>
-                    <td><span class="badge bg-danger">Saída</span></td>
-                    <td>-25</td>
-                    <td>Dr. João Santos</td>
-                    <td>Uso em procedimentos</td>
-                  </tr>
-                  <tr>
-                    <td>05/01/2024</td>
-                    <td><span class="badge bg-success">Entrada</span></td>
-                    <td>+200</td>
-                    <td>Enf. Ana Paula</td>
-                    <td>Compra mensal</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-adicionar">
-            <i class="fas fa-plus me-2"></i>Adicionar Estoque
-          </button>
-          <button type="button" class="btn btn-repor">
-            <i class="fas fa-sync-alt me-2"></i>Repor Estoque
-          </button>
-          <button type="button" class="btn btn-remover">
-            <i class="fas fa-minus me-2"></i>Remover Estoque
-          </button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-        </div>
-      </div>
     </div>
   </div>
   <div class="modal fade" id="novoProdutoModal" tabindex="-1">

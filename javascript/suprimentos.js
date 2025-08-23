@@ -1,10 +1,8 @@
-// Gestão de Suprimentos e Estoque
 let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
 let movimentacoes = JSON.parse(localStorage.getItem("movimentacoes")) || [];
 
 const perfil = localStorage.getItem("perfil") || "comum";
 
-// Inicialização
 document.addEventListener("DOMContentLoaded", () => {
   // Verificar permissões de acesso
   const perfil = localStorage.getItem("perfil") || "comum";
@@ -13,60 +11,13 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "dashboard.html";
     return;
   }
- 
-  gerarProdutosIniciais();
+
   atualizarEstatisticas();
   renderizarProdutos();
   verificarAlertasEstoque();
-  
-  // Event listeners
+
   document.getElementById("btnAcaoProduto")?.addEventListener("click", executarAcaoProduto);
 });
-
-// Gerar produtos iniciais
-function gerarProdutosIniciais() {
-  if (produtos.length > 0) return;
- 
-  const produtosIniciais = [
-    // Material Médico
-    { nome: "Seringas 3ml", categoria: "medico", localizacao: "farmacia", quantidade: 500, minimo: 100, unidade: "unidades", fornecedor: "FarmaMed" },
-    { nome: "Aguas para Injeção", categoria: "medico", localizacao: "farmacia", quantidade: 200, minimo: 50, unidade: "frascos", fornecedor: "MediLab" },
-    { nome: "Algodão 100%", categoria: "medico", localizacao: "enfermaria", quantidade: 80, minimo: 30, unidade: "pacotes", fornecedor: "MediClean" },
-    { nome: "Esparadrapo", categoria: "medico", localizacao: "enfermaria", quantidade: 150, minimo: 40, unidade: "rolos", fornecedor: "MediCare" },
-    { nome: "Gaze Estéril", categoria: "medico", localizacao: "enfermaria", quantidade: 120, minimo: 50, unidade: "pacotes", fornecedor: "MediLab" },
-    
-    // Material de Enfermagem
-    { nome: "Máscaras Cirúrgicas", categoria: "enfermagem", localizacao: "enfermaria", quantidade: 300, minimo: 100, unidade: "unidades", fornecedor: "MediProtect" },
-    { nome: "Luvas Nitrílicas", categoria: "enfermagem", localizacao: "enfermaria", quantidade: 200, minimo: 80, unidade: "caixas", fornecedor: "MediSafe" },
-    { nome: "Termômetros Digitais", categoria: "enfermagem", localizacao: "enfermaria", quantidade: 15, minimo: 5, unidade: "unidades", fornecedor: "MediTech" },
-    { nome: "Estetoscópios", categoria: "enfermagem", localizacao: "enfermaria", quantidade: 8, minimo: 3, unidade: "unidades", fornecedor: "MediPro" },
-    { nome: "Sacos de Coleta de Urina", categoria: "enfermagem", localizacao: "enfermaria", quantidade: 100, minimo: 30, unidade: "unidades", fornecedor: "MediCare" },
-    
-    // Material de Laboratório
-    { nome: "Tubos de Ensaio", categoria: "laboratorio", localizacao: "laboratorio", quantidade: 500, minimo: 200, unidade: "unidades", fornecedor: "LabMed" },
-    { nome: "Placas de Petri", categoria: "laboratorio", localizacao: "laboratorio", quantidade: 200, minimo: 80, unidade: "unidades", fornecedor: "LabTech" },
-    { nome: "Reagentes Químicos", categoria: "laboratorio", localizacao: "laboratorio", quantidade: 45, minimo: 15, unidade: "frascos", fornecedor: "ChemLab" },
-    { nome: "Microscópio", categoria: "laboratorio", localizacao: "laboratorio", quantidade: 3, minimo: 1, unidade: "unidades", fornecedor: "LabPro" },
-    { nome: "Pipetas Graduadas", categoria: "laboratorio", localizacao: "laboratorio", quantidade: 25, minimo: 10, unidade: "unidades", fornecedor: "LabMed" },
-    
-    // Material Administrativo
-    { nome: "Papel A4", categoria: "administrativo", localizacao: "administrativo", quantidade: 50, minimo: 20, unidade: "resmas", fornecedor: "OfficeMax" },
-    { nome: "Canetas Esferográficas", categoria: "administrativo", localizacao: "administrativo", quantidade: 100, minimo: 30, unidade: "unidades", fornecedor: "OfficePro" },
-    { nome: "Pastas de Arquivo", categoria: "administrativo", localizacao: "administrativo", quantidade: 80, minimo: 25, unidade: "unidades", fornecedor: "OfficeCare" },
-    { nome: "Etiquetas Adesivas", categoria: "administrativo", localizacao: "administrativo", quantidade: 200, minimo: 50, unidade: "folhas", fornecedor: "OfficeTech" },
-    { nome: "Grampos", categoria: "administrativo", localizacao: "administrativo", quantidade: 300, minimo: 100, unidade: "caixas", fornecedor: "OfficeMax" }
-  ];
-  
-  produtos = produtosIniciais.map((produto, index) => ({
-    id: index + 1,
-    ...produto,
-    status: definirStatusEstoque(produto.quantidade, produto.minimo),
-    dataUltimaMovimentacao: new Date().toISOString(),
-    criadoEm: new Date().toISOString()
-  }));
-  
-  localStorage.setItem("produtos", JSON.stringify(produtos));
-}
 
 // Definir status do estoque
 function definirStatusEstoque(quantidade, minimo) {
@@ -78,15 +29,22 @@ function definirStatusEstoque(quantidade, minimo) {
 // Atualizar estatísticas
 function atualizarEstatisticas() {
   const totalProdutos = produtos.length;
-  const totalEstoque = produtos.reduce((sum, p) => sum + p.quantidade, 0);
-  const baixoEstoque = produtos.filter(p => p.status === "baixo-estoque").length;
-  const emFalta = produtos.filter(p => p.status === "em-falta").length;
-  
+  const totalEstoque = produtos.reduce((sum, p) => sum + (p.quantidade || 0), 0);
+
+  const emFalta = produtos.filter(p => p.quantidade < p.estoqueMinimo).length;
+
+  const baixoEstoque = produtos.filter(p => 
+    p.quantidade >= p.estoqueMinimo && 
+    p.quantidade <= p.estoqueMinimo * 1.2
+  ).length;
+
+  // Atualiza na tela
   document.getElementById("totalProdutos").textContent = totalProdutos;
   document.getElementById("totalEstoque").textContent = totalEstoque.toLocaleString();
   document.getElementById("baixoEstoque").textContent = baixoEstoque;
   document.getElementById("emFalta").textContent = emFalta;
 }
+
 
 // Renderizar produtos
 function renderizarProdutos() {
@@ -158,7 +116,7 @@ function renderizarProdutos() {
       "em-falta": "estoque-em-falta"
     }[produto.status];
     
-    const porcentagem = Math.min((produto.quantidade / produto.minimo) * 100, 100);
+    const porcentagem = Math.min((produto.quantidade / produto.estoqueMinimo) * 100, 100);
     
     card.innerHTML = `
       <div class="d-flex justify-content-between align-items-start mb-2">
@@ -170,7 +128,7 @@ function renderizarProdutos() {
         <p><i class="fas fa-map-marker-alt me-1"></i>${produto.localizacao}</p>
         <p><i class="fas fa-boxes me-1"></i>${produto.quantidade} ${produto.unidade}</p>
         <p><i class="fas fa-building me-1"></i>${produto.fornecedor}</p>
-        <p><i class="fas fa-exclamation-triangle me-1"></i>Mínimo: ${produto.minimo} ${produto.unidade}</p>
+        <p><i class="fas fa-exclamation-triangle me-1"></i>Mínimo: ${produto.estoqueMinimo} ${produto.unidade}</p>
         
         <div class="estoque-bar">
           <div class="estoque-fill ${statusClass}" style="width: ${porcentagem}%"></div>
@@ -201,6 +159,16 @@ function limparFiltros() {
   renderizarProdutos();
 }
 
+  function calcularStatusEstoque(produto) {
+    if (produto.quantidade <= 0) {
+      return "em-falta";
+    } else if (produto.quantidade <= produto.estoqueMinimo) {
+      return "baixo-estoque";
+    } else {
+      return "saudavel";
+    }
+  }
+  
 // Abrir detalhes do produto
 function abrirDetalhesProduto(produto) {
   const perfil = localStorage.getItem("perfil") || "comum";
@@ -217,19 +185,21 @@ function abrirDetalhesProduto(produto) {
   const btnAcao = document.getElementById("btnAcaoProduto");
   
   modalTitle.textContent = produto.nome;
-  
+
+  const statusEstoque = calcularStatusEstoque(produto);
+
   const statusText = {
     "saudavel": "Saudável",
     "baixo-estoque": "Baixo Estoque",
     "em-falta": "Em Falta"
-  }[produto.status];
-  
+  }[statusEstoque];
+
   const statusColor = {
     "saudavel": "success",
     "baixo-estoque": "warning",
     "em-falta": "danger"
-  }[produto.status];
-  
+  }[statusEstoque];
+
   const movimentacoesProduto = movimentacoes.filter(m => m.produtoId === produto.id);
   
   modalBody.innerHTML = `
@@ -272,7 +242,7 @@ function abrirDetalhesProduto(produto) {
           </tr>
           <tr>
             <td><strong>Estoque Mínimo:</strong></td>
-            <td>${produto.minimo} ${produto.unidade}</td>
+            <td>${produto.estoqueMinimo} ${produto.unidade}</td>
           </tr>
           <tr>
             <td><strong>Unidade:</strong></td>
@@ -328,19 +298,17 @@ function abrirDetalhesProduto(produto) {
     </div>
   `;
   
-  // Configurar botão principal
-  if (produto.status === "em-falta") {
-    btnAcao.textContent = "Repor Estoque";
-    btnAcao.className = "btn btn-warning";
-  } else if (produto.status === "baixo-estoque") {
-    btnAcao.textContent = "Adicionar Estoque";
-    btnAcao.className = "btn btn-success";
-  } else {
-    btnAcao.textContent = "Remover Estoque";
-    btnAcao.className = "btn btn-danger";
-  }
-  
-  // Armazenar produto atual para ações
+
+if (produto.quantidade <= produto.estoqueMinimo) {
+  btnAcao.textContent = "Repor Estoque";
+  btnAcao.className = "btn btn-warning";
+} else if (produto.quantidade <= Math.floor(produto.estoqueMinimo * 1.5)) {
+  btnAcao.textContent = "Adicionar Estoque";
+  btnAcao.className = "btn btn-success";
+} else {
+  btnAcao.textContent = "Remover Estoque";
+  btnAcao.className = "btn btn-danger";
+}
   btnAcao.dataset.produtoId = produto.id;
   
   modal.show();
@@ -353,13 +321,14 @@ function executarAcaoProduto() {
   
   if (!produto) return;
   
-  if (produto.status === "em-falta") {
+  if (produto.quantidade <= produto.estoqueMinimo) {
     reporEstoque(produtoId);
-  } else if (produto.status === "baixo-estoque") {
+  } else if (produto.quantidade <= Math.floor(produto.estoqueMinimo * 1.5)) {
     adicionarEstoque(produtoId);
   } else {
     removerEstoque(produtoId);
   }
+
 }
 
 // Adicionar estoque
@@ -387,7 +356,7 @@ function adicionarEstoque(produtoId) {
   
   // Atualizar produto
   produto.quantidade += quantidadeInt;
-  produto.status = definirStatusEstoque(produto.quantidade, produto.minimo);
+  produto.status = definirStatusEstoque(produto.quantidade, produto.estoqueMinimo);
   produto.dataUltimaMovimentacao = new Date().toISOString();
   
   // Registrar movimentação
@@ -443,7 +412,7 @@ function removerEstoque(produtoId) {
   
   // Atualizar produto
   produto.quantidade -= quantidadeInt;
-  produto.status = definirStatusEstoque(produto.quantidade, produto.minimo);
+  produto.status = definirStatusEstoque(produto.quantidade, produto.estoqueMinimo);
   produto.dataUltimaMovimentacao = new Date().toISOString();
   
   // Registrar movimentação
@@ -483,7 +452,7 @@ function reporEstoque(produtoId) {
   
   if (!produto) return;
   
-  const quantidadeNecessaria = produto.minimo - produto.quantidade;
+  const quantidadeNecessaria = produto.estoqueMinimo - produto.quantidade;
   
   if (quantidadeNecessaria <= 0) {
     alert("O produto não precisa de reposição.");
@@ -530,7 +499,7 @@ function verificarAlertasEstoque() {
     alerta.className = "alert alert-warning alert-dismissible fade show alerta-estoque";
     alerta.innerHTML = `
       <i class="fas fa-exclamation-circle me-2"></i>
-      <strong>BAIXO ESTOQUE:</strong> ${produto.nome} (${produto.quantidade}/${produto.minimo} ${produto.unidade})
+      <strong>BAIXO ESTOQUE:</strong> ${produto.nome} (${produto.quantidade}/${produto.estoqueMinimo} ${produto.unidade})
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
     alertasContainer.appendChild(alerta);
