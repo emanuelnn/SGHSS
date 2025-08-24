@@ -1,13 +1,8 @@
-.disponibilidade-container {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  min-height: 100vh;
-  padding: 20px 0;
-}
 
 .card {
   border: none;
   border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgb(255, 255, 255);
   overflow: hidden;
 }
 
@@ -26,36 +21,37 @@
 }
 
 .nav-tabs {
-  border-bottom: 2px solid #dee2e6;
-  margin-bottom: 20px;
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 1.5rem;
 }
 
 .nav-tabs .nav-link {
-  border: none;
   color: #6c757d;
-  font-weight: 500;
+  border: none;
   padding: 12px 24px;
   margin-right: 8px;
   border-radius: 10px 10px 0 0;
+  font-weight: 500;
   transition: all 0.3s ease;
 }
 
 .nav-tabs .nav-link:hover {
+  color: #495057;
   background-color: #f8f9fa;
-  color: #007bff;
 }
 
 .nav-tabs .nav-link.active {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-  color: white;
+  color: #667eea;
+  background-color: white;
   border: none;
+  border-bottom: 3px solid #667eea;
 }
 
 .calendar-container {
   background: white;
   border-radius: 15px;
   padding: 20px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 5px 15px rgb(255, 255, 255);
 }
 
 .calendar-header {
@@ -71,7 +67,7 @@
 .calendar-header h5 {
   margin: 0;
   font-weight: 600;
-  color: #333;
+  color: #3b3b3b;
   font-size: 1.2rem;
 }
 
@@ -168,6 +164,7 @@
   border-radius: 10px;
   padding: 12px 16px;
   font-size: 1rem;
+  color:#131313;
   transition: all 0.3s ease;
 }
 
@@ -454,19 +451,19 @@ textarea {
 
 @media (prefers-contrast: high) {
   .calendar-day {
-    border: 2px solid #000;
+    border: 2px solid #ffffff;
   }
   
   .calendar-day.selected {
-    border: 3px solid #000;
+    border: 3px solid #ffffff;
   }
   
   .form-select, .form-control {
-    border: 2px solid #000;
+    border: 2px solid #ffffff;
   }
   
   .btn {
-    border: 2px solid #000;
+    border: 2px solid #ffffff;
   }
 }
 
@@ -475,70 +472,5 @@ textarea {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .disponibilidade-container {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  }
-  
-  .card {
-    background: #2d2d2d;
-    color: white;
-  }
-  
-  .calendar-container {
-    background: #2d2d2d;
-    color: white;
-  }
-  
-  .calendar-day {
-    background: #3d3d3d;
-    color: white;
-    border-color: #555;
-  }
-  
-  .calendar-day.today {
-    background: #28a745;
-  }
-  
-  .calendar-day.selected {
-    background: #007bff;
-  }
-  
-  .calendar-day.has-disponibility {
-    background: #17a2b8;
-  }
-  
-  .form-select, .form-control {
-    background: #3d3d3d;
-    color: white;
-    border-color: #555;
-  }
-  
-  .form-label {
-    color: white;
-  }
-  
-  .time-slot {
-    background: #3d3d3d;
-    color: white;
-    border-color: #555;
-  }
-  
-  .lista-profissionais .list-group-item {
-    background: #3d3d3d;
-    color: white;
-    border-color: #555;
-  }
-  
-  .info-profissional {
-    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
-    color: white;
-  }
-  
-  .especialidade-tag, .certificacao-tag {
-    background: #007bff;
   }
 }

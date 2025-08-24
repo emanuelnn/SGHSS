@@ -1,6 +1,7 @@
 // Sistema de Telemedicina
 let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 let teleconsultas = JSON.parse(localStorage.getItem("teleconsultas")) || [];
+let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
 let consultaEmAndamento = null;
 let chatMensagens = [];
 
@@ -116,6 +117,17 @@ function agendarTeleconsulta() {
   teleconsultas.push(novaTeleconsulta);
   localStorage.setItem("teleconsultas", JSON.stringify(teleconsultas));
   
+        const financeiro = {
+        id: financeiro.length > 0 ? financeiro[financeiro.length - 1].id + 1 : 1,
+        paciente: paciente,
+        tipo: "Telemedicina",
+        data: data,
+        valor: valorMonetarioAleatorio()
+      };
+  
+    financeiro.push(financeiro);
+    localStorage.setItem("financeiro", JSON.stringify(financeiro));
+
   // Mostrar mensagem de sucesso
   const alerta = document.createElement("div");
   alerta.className = "alert alert-success alert-dismissible fade show";

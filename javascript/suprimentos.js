@@ -1,12 +1,15 @@
 let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
 let movimentacoes = JSON.parse(localStorage.getItem("movimentacoes")) || [];
+let retiradas = JSON.parse(localStorage.getItem("retiradas")) || [];
 
 const perfil = localStorage.getItem("perfil") || "comum";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Verificar permissões de acesso
   const perfil = localStorage.getItem("perfil") || "comum";
-  if (perfil === "Paciente") {
+  const perfisPermitidos = ["Administrador", "Médico", "Enfermeiro(a)", "Enfermeiro"];
+  
+  if (!perfisPermitidos.includes(perfil)) {
     alert("Acesso negado! Apenas administradores, médicos e enfermeiros podem acessar esta página.");
     window.location.href = "dashboard.html";
     return;
@@ -14,10 +17,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
   atualizarEstatisticas();
   renderizarProdutos();
-  verificarAlertasEstoque();
-
-  document.getElementById("btnAcaoProduto")?.addEventListener("click", executarAcaoProduto);
+  popularSelectProdutos();
+  renderizarHistoricoRetiradas();
+ 
+  // Event listeners
+  document.getElementById("filtroCategoria")?.addEventListener("change", filtrarProdutos);
+  document.getElementById("filtroStatus")?.addEventListener("change", filtrarProdutos);
+  document.getElementById("filtroBusca")?.addEventListener("input", filtrarProdutos);
+  
+  document.getElementById("formRetirada")?.addEventListener("submit", registrarRetirada);
+  
+  // Popular filtros
+  popularFiltros();
 });
+
+// Função para popular select de produtos na aba de retiradas
+function popularSelectProdutos() {
+  const select = document.getElementById("produtoRetirada");
+  if (!select) return;
+  
+  select.innerHTML = '<option value="">Selecione o produto</option>';
+  
+  produtos.forEach(produto => {
+    if (produto.quantidade > 0) {
+      const option = document.createElement("option");
+      option.value = produto.id;
+      option.textContent = `${produto.nome} (${produto.quantidade} ${produto.unidade} disponíveis)`;
+      select.appendChild(option);
+    }
+  });
+}
+
+// Popular filtros
+function popularFiltros() {
+  const filtroCategoria = document.getElementById("filtroCategoria");
+  const filtroStatus = document.getElementById("filtroStatus");
+  
+  if (filtroCategoria) {
+    filtroCategoria.addEventListener("change", filtrarProdutos);
+  }
+  
+  if (filtroStatus) {
+    filtroStatus.addEventListener("change", filtrarProdutos);
+  }
+}
 
 // Definir status do estoque
 function definirStatusEstoque(quantidade, minimo) {
@@ -31,10 +74,10 @@ function atualizarEstatisticas() {
   const totalProdutos = produtos.length;
   const totalEstoque = produtos.reduce((sum, p) => sum + (p.quantidade || 0), 0);
 
-  const emFalta = produtos.filter(p => p.quantidade < p.estoqueMinimo).length;
+  const emFalta = produtos.filter(p => p.quantidade <= p.estoqueMinimo).length;
 
   const baixoEstoque = produtos.filter(p => 
-    p.quantidade >= p.estoqueMinimo && 
+    p.quantidade > p.estoqueMinimo && 
     p.quantidade <= p.estoqueMinimo * 1.2
   ).length;
 
@@ -45,29 +88,14 @@ function atualizarEstatisticas() {
   document.getElementById("emFalta").textContent = emFalta;
 }
 
-
 // Renderizar produtos
 function renderizarProdutos() {
   const grid = document.getElementById("estoqueGrid");
   if (!grid) return;
   
-  const perfil = localStorage.getItem("perfil") || "comum";
-  
-  // Verificar permissões
-  if (perfil === "Paciente") {
-    grid.innerHTML = `
-      <div class="text-center py-4">
-        <i class="fas fa-lock fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">Acesso Restrito</h5>
-        <p class="text-muted">Pacientes não podem visualizar detalhes dos produtos.</p>
-      </div>
-    `;
-    return;
-  }
-  
   const filtroCategoria = document.getElementById("filtroCategoria")?.value || "";
   const filtroStatus = document.getElementById("filtroStatus")?.value || "";
-  const filtroLocalizacao = document.getElementById("filtroLocalizacao")?.value || "";
+  const filtroBusca = document.getElementById("filtroBusca")?.value || "";
   
   let produtosFiltrados = produtos;
   
@@ -76,52 +104,45 @@ function renderizarProdutos() {
   }
   
   if (filtroStatus) {
-    produtosFiltrados = produtosFiltrados.filter(p => p.status === filtroStatus);
+    produtosFiltrados = produtosFiltrados.filter(p => {
+      const status = definirStatusEstoque(p.quantidade, p.estoqueMinimo);
+      return status === filtroStatus;
+    });
   }
   
-  if (filtroLocalizacao) {
-    produtosFiltrados = produtosFiltrados.filter(p => p.localizacao === filtroLocalizacao);
+  if (filtroBusca) {
+    produtosFiltrados = produtosFiltrados.filter(p => 
+      p.nome.toLowerCase().includes(filtroBusca.toLowerCase())
+    );
   }
   
   grid.innerHTML = "";
   
   produtosFiltrados.forEach(produto => {
-    const card = document.createElement("div");
-    card.className = `produto-card ${produto.status}`;
-    card.onclick = () => abrirDetalhesProduto(produto);
-    
-    const categoriaClass = {
-      "medico": "categoria-medico",
-      "enfermagem": "categoria-enfermagem",
-      "laboratorio": "categoria-laboratorio",
-      "administrativo": "categoria-administrativo"
-    }[produto.categoria];
-    
-    const categoriaText = {
-      "medico": "Material Médico",
-      "enfermagem": "Material de Enfermagem",
-      "laboratorio": "Laboratório",
-      "administrativo": "Administrativo"
-    }[produto.categoria];
+    const statusEstoque = definirStatusEstoque(produto.quantidade, produto.estoqueMinimo);
     
     const statusText = {
       "saudavel": "Saudável",
       "baixo-estoque": "Baixo Estoque",
       "em-falta": "Em Falta"
-    }[produto.status];
+    }[statusEstoque];
     
     const statusClass = {
       "saudavel": "estoque-saudavel",
       "baixo-estoque": "estoque-baixo",
       "em-falta": "estoque-em-falta"
-    }[produto.status];
+    }[statusEstoque];
     
-    const porcentagem = Math.min((produto.quantidade / produto.estoqueMinimo) * 100, 100);
+    const porcentagem = Math.min((produto.quantidade / Math.max(produto.estoqueMinimo, 1)) * 100, 100);
+    
+    const card = document.createElement("div");
+    card.className = `produto-card ${statusClass}`;
+    card.onclick = () => abrirDetalhesProduto(produto);
     
     card.innerHTML = `
       <div class="d-flex justify-content-between align-items-start mb-2">
         <h6 class="mb-0">${produto.nome}</h6>
-        <span class="categoria-badge ${categoriaClass}">${categoriaText}</span>
+        <span class="categoria-badge">${produto.categoria}</span>
       </div>
       
       <div class="produto-info">
@@ -155,30 +176,12 @@ function filtrarProdutos() {
 function limparFiltros() {
   document.getElementById("filtroCategoria").value = "";
   document.getElementById("filtroStatus").value = "";
-  document.getElementById("filtroLocalizacao").value = "";
+  document.getElementById("filtroBusca").value = "";
   renderizarProdutos();
 }
 
-  function calcularStatusEstoque(produto) {
-    if (produto.quantidade <= 0) {
-      return "em-falta";
-    } else if (produto.quantidade <= produto.estoqueMinimo) {
-      return "baixo-estoque";
-    } else {
-      return "saudavel";
-    }
-  }
-  
 // Abrir detalhes do produto
 function abrirDetalhesProduto(produto) {
-  const perfil = localStorage.getItem("perfil") || "comum";
-  
-  // Verificar permissões
-  if (perfil === "Paciente") {
-    alert("Acesso negado! Apenas administradores, médicos e enfermeiros podem acessar detalhes dos produtos.");
-    return;
-  }
-  
   const modal = new bootstrap.Modal(document.getElementById("produtoModal"));
   const modalTitle = document.getElementById("modalTitle");
   const modalBody = document.getElementById("modalBody");
@@ -186,7 +189,7 @@ function abrirDetalhesProduto(produto) {
   
   modalTitle.textContent = produto.nome;
 
-  const statusEstoque = calcularStatusEstoque(produto);
+  const statusEstoque = definirStatusEstoque(produto.quantidade, produto.estoqueMinimo);
 
   const statusText = {
     "saudavel": "Saudável",
@@ -297,18 +300,18 @@ function abrirDetalhesProduto(produto) {
       </div>
     </div>
   `;
-  
 
-if (produto.quantidade <= produto.estoqueMinimo) {
-  btnAcao.textContent = "Repor Estoque";
-  btnAcao.className = "btn btn-warning";
-} else if (produto.quantidade <= Math.floor(produto.estoqueMinimo * 1.5)) {
-  btnAcao.textContent = "Adicionar Estoque";
-  btnAcao.className = "btn btn-success";
-} else {
-  btnAcao.textContent = "Remover Estoque";
-  btnAcao.className = "btn btn-danger";
-}
+  if (produto.quantidade <= produto.estoqueMinimo) {
+    btnAcao.textContent = "Repor Estoque";
+    btnAcao.className = "btn btn-warning";
+  } else if (produto.quantidade <= Math.floor(produto.estoqueMinimo * 1.5)) {
+    btnAcao.textContent = "Adicionar Estoque";
+    btnAcao.className = "btn btn-success";
+  } else {
+    btnAcao.textContent = "Remover Estoque";
+    btnAcao.className = "btn btn-danger";
+  }
+  
   btnAcao.dataset.produtoId = produto.id;
   
   modal.show();
@@ -328,19 +331,66 @@ function executarAcaoProduto() {
   } else {
     removerEstoque(produtoId);
   }
+}
 
+// Salvar novo produto
+function salvarNovoProduto() {
+  const nome = document.getElementById("nomeProduto").value.trim();
+  const categoria = document.getElementById("categoriaProduto").value;
+  const quantidade = parseInt(document.getElementById("quantidadeInicial").value);
+  const unidade = document.getElementById("unidadeProduto").value;
+  const estoqueMinimo = parseInt(document.getElementById("estoqueMinimo").value);
+  const fornecedor = document.getElementById("fornecedorProduto").value.trim();
+  const localizacao = document.getElementById("localizacaoProduto").value.trim();
+
+  if (!nome || !categoria || !quantidade || !unidade || !estoqueMinimo || !fornecedor || !localizacao) {
+    alert("Por favor, preencha todos os campos.");
+    return;
+  }
+
+  const novoProduto = {
+    id: Date.now(),
+    nome,
+    categoria,
+    quantidade,
+    unidade,
+    estoqueMinimo,
+    fornecedor,
+    localizacao,
+    status: definirStatusEstoque(quantidade, estoqueMinimo),
+    dataUltimaMovimentacao: new Date().toISOString()
+  };
+
+  produtos.push(novoProduto);
+  localStorage.setItem("produtos", JSON.stringify(produtos));
+
+  // Registrar movimentação inicial
+  movimentacoes.push({
+    id: Date.now(),
+    produtoId: novoProduto.id,
+    tipo: "entrada",
+    quantidade: quantidade,
+    responsavel: perfil,
+    data: new Date().toISOString(),
+    observacoes: `Entrada inicial de ${quantidade} ${unidade}`
+  });
+
+  localStorage.setItem("movimentacoes", JSON.stringify(movimentacoes));
+
+  // Fechar modal e atualizar
+  bootstrap.Modal.getInstance(document.getElementById("novoProdutoModal")).hide();
+  atualizarEstatisticas();
+  renderizarProdutos();
+  popularSelectProdutos();
+
+  // Limpar formulário
+  document.getElementById("formNovoProduto").reset();
+
+  alert(`Produto "${nome}" cadastrado com sucesso!`);
 }
 
 // Adicionar estoque
 function adicionarEstoque(produtoId) {
-  const perfil = localStorage.getItem("perfil") || "comum";
-  
-  // Verificar permissões
-  if (perfil === "Paciente") {
-    alert("Acesso negado! Apenas administradores, médicos e enfermeiros podem gerenciar estoque.");
-    return;
-  }
-  
   const produto = produtos.find(p => p.id === produtoId);
   
   if (!produto) return;
@@ -377,21 +427,13 @@ function adicionarEstoque(produtoId) {
   bootstrap.Modal.getInstance(document.getElementById("produtoModal")).hide();
   atualizarEstatisticas();
   renderizarProdutos();
-  verificarAlertasEstoque();
-  
+  popularSelectProdutos();
+ 
   alert(`Estoque atualizado! ${quantidadeInt} ${produto.unidade} adicionadas.`);
 }
 
 // Remover estoque
 function removerEstoque(produtoId) {
-  const perfil = localStorage.getItem("perfil") || "comum";
-  
-  // Verificar permissões
-  if (perfil === "Paciente") {
-    alert("Acesso negado! Apenas administradores, médicos e enfermeiros podem gerenciar estoque.");
-    return;
-  }
-  
   const produto = produtos.find(p => p.id === produtoId);
   
   if (!produto) return;
@@ -433,21 +475,13 @@ function removerEstoque(produtoId) {
   bootstrap.Modal.getInstance(document.getElementById("produtoModal")).hide();
   atualizarEstatisticas();
   renderizarProdutos();
-  verificarAlertasEstoque();
+  popularSelectProdutos();
   
   alert(`Estoque atualizado! ${quantidadeInt} ${produto.unidade} removidas.`);
 }
 
-// repor estoque
+// Repor estoque
 function reporEstoque(produtoId) {
-  const perfil = localStorage.getItem("perfil") || "comum";
-  
-  // Verificar permissões
-  if (perfil === "Paciente") {
-    alert("Acesso negado! Apenas administradores, médicos e enfermeiros podem gerenciar estoque.");
-    return;
-  }
-  
   const produto = produtos.find(p => p.id === produtoId);
   
   if (!produto) return;
@@ -464,51 +498,181 @@ function reporEstoque(produtoId) {
   }
 }
 
-// Verificar alertas de estoque
-function verificarAlertasEstoque() {
-  const perfil = localStorage.getItem("perfil") || "comum";
-  const alertasContainer = document.getElementById("alertasContainer");
-  if (!alertasContainer) return;
+// Registrar retirada
+function registrarRetirada(e) {
+  e.preventDefault();
   
-  // Verificar permissões
-  if (perfil === "Paciente") {
-    alertasContainer.innerHTML = "";
+  const produtoId = parseInt(document.getElementById("produtoRetirada").value);
+  const quantidade = parseInt(document.getElementById("quantidadeRetirada").value);
+  const motivo = document.getElementById("motivoRetirada").value;
+  const observacoes = document.getElementById("observacoesRetirada").value.trim();
+  
+  if (!produtoId || !quantidade || !motivo) {
+    alert("Por favor, preencha todos os campos obrigatórios.");
     return;
   }
   
-  const produtosEmFalta = produtos.filter(p => p.status === "em-falta");
-  const produtosBaixoEstoque = produtos.filter(p => p.status === "baixo-estoque");
+  const produto = produtos.find(p => p.id === produtoId);
+  if (!produto) {
+    alert("Produto não encontrado.");
+    return;
+  }
   
-  alertasContainer.innerHTML = "";
+  if (quantidade > produto.quantidade) {
+    alert("Quantidade a retirar é maior que o estoque disponível.");
+    return;
+  }
   
-  // Alertas de falta
-  produtosEmFalta.forEach(produto => {
-    const alerta = document.createElement("div");
-    alerta.className = "alert alert-danger alert-dismissible fade show alerta-estoque";
-    alerta.innerHTML = `
-      <i class="fas fa-exclamation-triangle me-2"></i>
-      <strong>EM FALTA:</strong> ${produto.nome} (${produto.localizacao})
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    alertasContainer.appendChild(alerta);
+  // Registrar retirada
+  const novaRetirada = {
+    id: Date.now(),
+    produtoId: produtoId,
+    produtoNome: produto.nome,
+    quantidade: quantidade,
+    responsavel: perfil,
+    motivo: motivo,
+    observacoes: observacoes,
+    data: new Date().toISOString()
+  };
+  
+  retiradas.push(novaRetirada);
+  localStorage.setItem("retiradas", JSON.stringify(retiradas));
+  
+  // Atualizar estoque do produto
+  produto.quantidade -= quantidade;
+  produto.status = definirStatusEstoque(produto.quantidade, produto.estoqueMinimo);
+  produto.dataUltimaMovimentacao = new Date().toISOString();
+  
+  // Registrar movimentação
+  movimentacoes.push({
+    id: Date.now(),
+    produtoId: produtoId,
+    tipo: "saida",
+    quantidade: quantidade,
+    responsavel: perfil,
+    data: new Date().toISOString(),
+    observacoes: `Retirada: ${motivo} - ${observacoes || 'Sem observações'}`
   });
   
-  // Alertas de baixo estoque
-  produtosBaixoEstoque.forEach(produto => {
-    const alerta = document.createElement("div");
-    alerta.className = "alert alert-warning alert-dismissible fade show alerta-estoque";
-    alerta.innerHTML = `
-      <i class="fas fa-exclamation-circle me-2"></i>
-      <strong>BAIXO ESTOQUE:</strong> ${produto.nome} (${produto.quantidade}/${produto.estoqueMinimo} ${produto.unidade})
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    alertasContainer.appendChild(alerta);
+  localStorage.setItem("produtos", JSON.stringify(produtos));
+  localStorage.setItem("movimentacoes", JSON.stringify(movimentacoes));
+  
+  // Fechar modal e atualizar
+  bootstrap.Modal.getInstance(document.getElementById("produtoModal"))?.hide();
+  atualizarEstatisticas();
+  renderizarProdutos();
+  popularSelectProdutos();
+  renderizarHistoricoRetiradas();
+  
+  // Limpar formulário
+  document.getElementById("formRetirada").reset();
+  
+  alert(`Retirada registrada com sucesso! ${quantidade} ${produto.unidade} de ${produto.nome}.`);
+}
+
+// Renderizar histórico de retiradas
+function renderizarHistoricoRetiradas() {
+  const tbody = document.getElementById("historicoRetiradas");
+  const nenhumaRetirada = document.getElementById("nenhumaRetirada");
+  
+  if (!tbody || !nenhumaRetirada) return;
+  
+  if (retiradas.length === 0) {
+    tbody.innerHTML = "";
+    nenhumaRetirada.style.display = "block";
+    return;
+  }
+  
+  nenhumaRetirada.style.display = "none";
+  
+  tbody.innerHTML = retiradas.slice(-10).reverse().map(retirada => `
+    <tr>
+      <td>${formatarData(retirada.data)}</td>
+      <td>${retirada.produtoNome}</td>
+      <td>${retirada.quantidade}</td>
+      <td>${retirada.responsavel}</td>
+      <td>${retirada.motivo}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-danger" onclick="excluirRetirada(${retirada.id})" title="Excluir">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// Excluir retirada
+function excluirRetirada(retiradaId) {
+  if (!confirm("Tem certeza que deseja excluir esta retirada?")) return;
+  
+  const retirada = retiradas.find(r => r.id === retiradaId);
+  if (!retirada) return;
+  
+  // Reabastecer o estoque
+  const produto = produtos.find(p => p.id === retirada.produtoId);
+  if (produto) {
+    produto.quantidade += retirada.quantidade;
+    produto.status = definirStatusEstoque(produto.quantidade, produto.estoqueMinimo);
+    produto.dataUltimaMovimentacao = new Date().toISOString();
+    
+    localStorage.setItem("produtos", JSON.stringify(produtos));
+  }
+  
+  // Remover retirada
+  retiradas = retiradas.filter(r => r.id !== retiradaId);
+  localStorage.setItem("retiradas", JSON.stringify(retiradas));
+  
+  // Atualizar interface
+  atualizarEstatisticas();
+  renderizarProdutos();
+  popularSelectProdutos();
+  renderizarHistoricoRetiradas();
+  
+  alert("Retirada excluída e estoque reabastecido.");
+}
+
+// Exportar relatório
+function exportarRelatorio() {
+  if (produtos.length === 0) {
+    alert("Nenhum produto para exportar.");
+    return;
+  }
+  
+  let csv = "ID,Nome,Categoria,Quantidade,Unidade,Estoque Mínimo,Fornecedor,Localização,Status\n";
+  
+  produtos.forEach(produto => {
+    csv += `${produto.id},"${produto.nome}","${produto.categoria}",${produto.quantidade},"${produto.unidade}",${produto.estoqueMinimo},"${produto.fornecedor}","${produto.localizacao}","${produto.status}"\n`;
   });
   
-  // Remover alertas automaticamente após 5 segundos
-  setTimeout(() => {
-    alertasContainer.innerHTML = "";
-  }, 5000);
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `relatorio_estoque_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+// Exportar retiradas
+function exportarRetiradas() {
+  if (retiradas.length === 0) {
+    alert("Nenhuma retirada para exportar.");
+    return;
+  }
+  
+  let csv = "ID,Produto,Quantidade,Responsável,Motivo,Observações,Data\n";
+  
+  retiradas.forEach(retirada => {
+    csv += `${retirada.id},"${retirada.produtoNome}",${retirada.quantidade},"${retirada.responsavel}","${retirada.motivo}","${retirada.observacoes}","${formatarData(retirada.data)}"\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `relatorio_retiradas_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  window.URL.revokeObjectURL(url);
 }
 
 // Formatar data

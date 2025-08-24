@@ -7,9 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles/suprimentos.css" />
-  <link rel="stylesheet" href="styles/main.css"/>
+  <link rel="stylesheet" href="/styles/main.css"/>
 </head>
-<body class="suprimentos-container">
+<body class="bg-light">
   <div class="container mt-5">
     <div class="card p-4 shadow">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -20,92 +20,186 @@
           <i class="fas fa-arrow-left me-1"></i>Voltar ao Menu
         </a>
       </div>
-    <div class="estatisticas-grid">
-      <div class="estatistica-card primary">
-        <div class="estatistica-icon">
-          <i class="fas fa-boxes"></i>
-        </div>
-        <div class="estatistica-valor" id ="totalProdutos">0</div>
-        <div class="estatistica-label">Total de Produtos</div>
-      </div>
-     
-      <div class="estatistica-card success">
-        <div class="estatistica-icon">
-          <i class="fas fa-check-circle"></i>
-        </div>
-        <div class="estatistica-valor" id="totalEstoque">0</div>
-        <div class="estatistica-label">Em Estoque</div>
-      </div>
-      
-      <div class="estatistica-card warning">
-        <div class="estatistica-icon">
-          <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <div class="estatistica-valor" id = "baixoEstoque">0</div>
-        <div class="estatistica-label">Estoque Baixo</div>
-      </div>
-      
-      <div class="estatistica-card danger">
-        <div class="estatistica-icon">
-          <i class="fas fa-times-circle"></i>
-        </div>
-        <div class="estatistica-valor" id = "emFalta">0</div>
-        <div class="estatistica-label">Em Falta</div>
-      </div>
-    </div>
 
-    <div class="filtros-section">
-      <h5 class="filtros-title">
-        <i class="fas fa-filter me-2"></i>Filtros de Busca
-      </h5>
-      <div class="filtros-grid">
-        <div class="filtro-group">
-          <label class="filtro-label">Categoria</label>
-          <select class="filtro-select">
-            <option value="">Todas as Categorias</option>
-            <option value="medico">Material Médico</option>
-            <option value="enfermagem">Material de Enfermagem</option>
-            <option value="laboratorio">Material de Laboratório</option>
-            <option value="administrativo">Material Administrativo</option>
-          </select>
-        </div>
-       
-        <div class="filtro-group">
-          <label class="filtro-label">Status</label>
-          <select class="filtro-select">
-            <option value="">Todos os Status</option>
-            <option value="saudavel">Estoque Saudável</option>
-            <option value="baixo">Estoque Baixo</option>
-            <option value="falta">Em Falta</option>
-          </select>
-        </div>
-
-        <div class="filtro-group">
-          <label class="filtro-label">Buscar Produto</label>
-          <input type="text" class="filtro-input" placeholder="Digite o nome do produto">
-        </div>
-        
-        <div class="filtro-group">
-          <button class="btn-limpar-filtros">
-            <i class="fas fa-eraser me-2"></i>Limpar Filtros
+      <ul class="nav nav-tabs mb-4" id="suprimentosTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="estoque-tab" data-bs-toggle="tab" data-bs-target="#estoque" type="button" role="tab">
+            <i class="fas fa-boxes me-2"></i>Gerenciar Estoque
           </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="retiradas-tab" data-bs-toggle="tab" data-bs-target="#retiradas" type="button" role="tab">
+            <i class="fas fa-clipboard-list me-2"></i>Registrar Retiradas
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="suprimentosTabContent">
+        <div class="tab-pane fade show active" id="estoque" role="tabpanel">
+          <div class="estatisticas-grid">
+            <div class="estatistica-card primary">
+              <div class="estatistica-icon">
+                <i class="fas fa-boxes"></i>
+              </div>
+              <div class="estatistica-valor" id="totalProdutos">0</div>
+              <div class="estatistica-label">Total de Produtos</div>
+            </div>
+           
+            <div class="estatistica-card success">
+              <div class="estatistica-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="estatistica-valor" id="totalEstoque">0</div>
+              <div class="estatistica-label">Em Estoque</div>
+            </div>
+            
+            <div class="estatistica-card warning">
+              <div class="estatistica-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <div class="estatistica-valor" id="baixoEstoque">0</div>
+              <div class="estatistica-label">Estoque Baixo</div>
+            </div>
+            
+            <div class="estatistica-card danger">
+              <div class="estatistica-icon">
+                <i class="fas fa-times-circle"></i>
+              </div>
+              <div class="estatistica-valor" id="emFalta">0</div>
+              <div class="estatistica-label">Em Falta</div>
+            </div>
+          </div>
+
+          <div class="filtros-section">
+            <h5 class="filtros-title">
+              <i class="fas fa-filter me-2"></i>Filtros de Busca
+            </h5>
+            <div class="filtros-grid">
+              <div class="filtro-group">
+                <label class="filtro-label">Categoria</label>
+                <select class="filtro-select" id="filtroCategoria">
+                  <option value="">Todas as Categorias</option>
+                  <option value="medico">Material Médico</option>
+                  <option value="enfermagem">Material de Enfermagem</option>
+                  <option value="laboratorio">Material de Laboratório</option>
+                  <option value="administrativo">Material Administrativo</option>
+                </select>
+              </div>
+             
+              <div class="filtro-group">
+                <label class="filtro-label">Status</label>
+                <select class="filtro-select" id="filtroStatus">
+                  <option value="">Todos os Status</option>
+                  <option value="saudavel">Estoque Saudável</option>
+                  <option value="baixo">Estoque Baixo</option>
+                  <option value="falta">Em Falta</option>
+                </select>
+              </div>
+
+              <div class="filtro-group">
+                <label class="filtro-label">Buscar Produto</label>
+                <input type="text" class="filtro-input" id="filtroBusca" placeholder="Digite o nome do produto">
+              </div>
+              
+              <div class="filtro-group">
+                <button class="btn-limpar-filtros" onclick="limparFiltros()">
+                  <i class="fas fa-eraser me-2"></i>Limpar Filtros
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#novoProdutoModal">
+              <i class="fas fa-plus me-2"></i>Novo Produto
+            </button>
+            <button class="btn btn-success me-2" onclick="exportarRelatorio()">
+              <i class="fas fa-download me-2"></i>Exportar Relatório
+            </button>
+          </div>
+         
+          <div class="text-center mt-4">
+            <div class="produtos-grid" id="estoqueGrid">
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="retiradas" role="tabpanel">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">Nova Retirada</h6>
+                </div>
+                <div class="card-body">
+                  <form id="formRetirada">
+                    <div class="mb-3">
+                      <label class="form-label">Produto</label>
+                      <select class="form-select" id="produtoRetirada" required>
+                        <option value="">Selecione o produto</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Quantidade</label>
+                      <input type="number" class="form-control" id="quantidadeRetirada" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Motivo</label>
+                      <select class="form-select" id="motivoRetirada" required>
+                        <option value="">Selecione o motivo</option>
+                        <option value="uso-paciente">Uso do Paciente</option>
+                        <option value="procedimento">Procedimento Médico</option>
+                        <option value="manutencao">Manutenção de Equipamentos</option>
+                        <option value="administrativo">Uso Administrativo</option>
+                        <option value="outros">Outros</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Observações</label>
+                      <textarea class="form-control" id="observacoesRetirada" rows="3" placeholder="Detalhes adicionais sobre a retirada"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                      <i class="fas fa-save me-2"></i>Registrar Retirada
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h6 class="mb-0">Histórico de Retiradas</h6>
+                  <button class="btn btn-sm btn-outline-primary" onclick="exportarRetiradas()">
+                    <i class="fas fa-download me-1"></i>Exportar
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>Data</th>
+                          <th>Produto</th>
+                          <th>Quantidade</th>
+                          <th>Responsável</th>
+                          <th>Motivo</th>
+                          <th>Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody id="historicoRetiradas">
+                      </tbody>
+                    </table>
+                  </div>
+                  <div id="nenhumaRetirada" class="text-center text-muted py-4" style="display: none;">
+                    <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+                    <p>Nenhuma retirada registrada.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="text-center mt-4">
-      <div class="produtos-grid" id ="estoqueGrid">
-        <!-- Cards de produtos serão inseridos aqui via JavaScript -->
-      </div>
-    </div>
-
-    <div class="text-center mt-4">
-      <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#novoProdutoModal">
-        <i class="fas fa-plus me-2"></i>Novo Produto
-      </button>
-      <button class="btn btn-success me-2">
-        <i class="fas fa-download me-2"></i>Exportar Relatório
-      </button>
     </div>
   </div>
   <div class="modal fade" id="novoProdutoModal" tabindex="-1">
@@ -119,11 +213,11 @@
           <form id="formNovoProduto">
             <div class="mb-3">
               <label class="form-label">Nome do Produto</label>
-              <input type="text" class="form-control" required>
+              <input type="text" class="form-control" id="nomeProduto" required>
             </div>
             <div class="mb-3">
               <label class="form-label">Categoria</label>
-              <select class="form-select" required>
+              <select class="form-select" id="categoriaProduto" required>
                 <option value="">Selecione...</option>
                 <option value="medico">Material Médico</option>
                 <option value="enfermagem">Material de Enfermagem</option>
@@ -131,23 +225,66 @@
                 <option value="administrativo">Material Administrativo</option>
               </select>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Quantidade Inicial</label>
-              <input type="number" class="form-control" min="0" required>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Quantidade Inicial</label>
+                  <input type="number" class="form-control" id="quantidadeInicial" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Unidade</label>
+                  <select class="form-select" id="unidadeProduto" required>
+                    <option value="unidade">Unidade</option>
+                    <option value="caixa">Caixa</option>
+                    <option value="frasco">Frasco</option>
+                    <option value="pote">Pote</option>
+                    <option value="kit">Kit</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Estoque Mínimo</label>
-              <input type="number" class="form-control" min="0" required>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Estoque Mínimo</label>
+                  <input type="number" class="form-control" id="estoqueMinimo" min="0" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Fornecedor</label>
+                  <input type="text" class="form-control" id="fornecedorProduto" required>
+                </div>
+              </div>
             </div>
             <div class="mb-3">
               <label class="form-label">Localização</label>
-              <input type="text" class="form-control" placeholder="Ex: Armazém A - Prateleira 1" required>
+              <input type="text" class="form-control" id="localizacaoProduto" placeholder="Ex: Armazém A - Prateleira 1" required>
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary">Salvar Produto</button>
+          <button type="button" class="btn btn-primary" onclick="salvarNovoProduto()">Salvar Produto</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="produtoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Detalhes do Produto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="modalBody">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary" id="btnAcaoProduto">Ação</button>
         </div>
       </div>
     </div>

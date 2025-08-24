@@ -1,7 +1,15 @@
-let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-let exames = JSON.parse(localStorage.getItem("exames")) || [];
+let usuarios      = JSON.parse(localStorage.getItem("usuarios")) || [];
+let exames        = JSON.parse(localStorage.getItem("exames")) || [];
+let consultas     = JSON.parse(localStorage.getItem("consultas")) || [];
+let teleconsultas = JSON.parse(localStorage.getItem("teleconsultas")) || [];
+let financeiro    = JSON.parse(localStorage.getItem("financeiro")) || [];
 
 const perfil = localStorage.getItem("perfil") || "comum";
+
+function valorMonetarioAleatorio() {
+  const valor = Math.floor(Math.random() * (2000 - 100 + 1)) + 50;
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   popularPacientes();
@@ -52,7 +60,6 @@ function popularPacientes() {
   }
 }
 
-// Popular filtros
 function popularFiltros() {
   const tiposExames = [...new Set(exames.map(e => e.tipo))];
   const filtroTipoExame = document.getElementById("filtroTipoExame");
@@ -68,7 +75,6 @@ function popularFiltros() {
   }
 }
 
-// Toggle campo de outro exame
 function toggleOutroExame() {
   const tipoExame = document.getElementById("tipoExame").value;
   const outroExameDiv = document.getElementById("outroExameDiv");
@@ -83,7 +89,6 @@ function toggleOutroExame() {
   }
 }
 
-// Validar data do exame
 function validarDataExame() {
   const dataExame = document.getElementById("dataExame").value;
   const dataAtual = new Date().toISOString().split("T")[0];
@@ -94,74 +99,83 @@ function validarDataExame() {
   }
 }
 
-// Agendar exame
 function agendarExame() {
-  const paciente = document.getElementById("pacienteExame").value;
-  const tipoExame = document.getElementById("tipoExame").value;
-  const outroExame = document.getElementById("outroExame").value;
-  const dataExame = document.getElementById("dataExame").value;
-  const horarioExame = document.getElementById("horarioExame").value;
-  const localExame = document.getElementById("localExame").value;
-  const observacoesExame = document.getElementById("observacoesExame").value;
+    const paciente = document.getElementById("pacienteExame").value;
+    const tipoExame = document.getElementById("tipoExame").value;
+    const outroExame = document.getElementById("outroExame").value;
+    const dataExame = document.getElementById("dataExame").value;
+    const horarioExame = document.getElementById("horarioExame").value;
+    const localExame = document.getElementById("localExame").value;
+    const observacoesExame = document.getElementById("observacoesExame").value;
+    
+    // Validação
+    if (!paciente || !tipoExame || !dataExame || !horarioExame || !localExame) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
   
-  // Validação
-  if (!paciente || !tipoExame || !dataExame || !horarioExame || !localExame) {
-    alert("Por favor, preencha todos os campos obrigatórios.");
-    return;
-  }
+    if (tipoExame === "Outro" && !outroExame) {
+      alert("Por favor, especifique o tipo de exame.");
+      return;
+    }
   
-  if (tipoExame === "Outro" && !outroExame) {
-    alert("Por favor, especifique o tipo de exame.");
-    return;
-  }
+    const novoExame = {
+      id: Date.now(),
+      paciente: paciente,
+      tipo: tipoExame === "Outro" ? outroExame : tipoExame,
+      data: dataExame,
+      horario: horarioExame,
+      local: localExame,
+      observacoes: observacoesExame,
+      status: "Aguardando",
+      resultado: "",
+      medicoResponsavel: "",
+      dataResultado: "",
+      dataCadastro: new Date().toISOString()
+    };
+
+      const financeiro = {
+        id: financeiro.length + 1,
+        paciente: paciente,
+        tipo: "Exame",
+        data: dataExame,
+        valor: valorMonetarioAleatorio()
+      };
   
-  const novoExame = {
-    id: Date.now(),
-    paciente: paciente,
-    tipo: tipoExame === "Outro" ? outroExame : tipoExame,
-    data: dataExame,
-    horario: horarioExame,
-    local: localExame,
-    observacoes: observacoesExame,
-    status: "Aguardando",
-    resultado: "",
-    medicoResponsavel: "",
-    dataResultado: "",
-    dataCadastro: new Date().toISOString()
-  };
+    financeiro.push(financeiro);
+    localStorage.setItem("financeiro", JSON.stringify(financeiro));
   
-  exames.push(novoExame);
-  localStorage.setItem("exames", JSON.stringify(exames));
+    exames.push(novoExame);
+    localStorage.setItem("exames", JSON.stringify(exames));
   
-  // Mostrar mensagem de sucesso
-  const alerta = document.createElement("div");
-  alerta.className = "alert alert-success alert-dismissible fade show";
-  alerta.innerHTML = `
-    <i class="fas fa-check-circle me-2"></i>
-    Exame marcado com sucesso!
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-  `;
+    // Mostrar mensagem de sucesso
+    const alerta = document.createElement("div");
+    alerta.className = "alert alert-success alert-dismissible fade show";
+    alerta.innerHTML = `
+      <i class="fas fa-check-circle me-2"></i>
+      Exame marcado com sucesso!
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector("#agendar .container");
+    container.insertBefore(alerta, container.firstChild);
   
-  const container = document.querySelector("#agendar .container");
-  container.insertBefore(alerta, container.firstChild);
-  
-  // Limpar formulário
-  document.getElementById("pacienteExame").value = "";
-  document.getElementById("tipoExame").value = "";
-  document.getElementById("outroExame").value = "";
-  document.getElementById("dataExame").value = "";
-  document.getElementById("horarioExame").value = "";
-  document.getElementById("localExame").value = "";
-  document.getElementById("observacoesExame").value = "";
-  toggleOutroExame();
-  
-  // Remover alerta após 3 segundos
-  setTimeout(() => {
-    alerta.remove();
-  }, 3000);
+    // Limpar formulário
+    document.getElementById("pacienteExame").value = "";
+    document.getElementById("tipoExame").value = "";
+    document.getElementById("outroExame").value = "";
+    document.getElementById("dataExame").value = "";
+    document.getElementById("horarioExame").value = "";
+    document.getElementById("localExame").value = "";
+    document.getElementById("observacoesExame").value = "";
+    toggleOutroExame();
+    
+    // Remover alerta após 3 segundos
+    setTimeout(() => {
+      alerta.remove();
+    }, 3000);
 }
 
-// Filtrar resultados
 function filtrarResultados() {
   const filtroPaciente = document.getElementById("filtroPacienteResultado").value;
   const filtroTipo = document.getElementById("filtroTipoExame").value;
@@ -177,7 +191,6 @@ function filtrarResultados() {
   renderizarResultados(examesFiltrados);
 }
 
-// Renderizar lista de resultados
 function renderizarResultados(examesParaRenderizar) {
   const listaResultados = document.getElementById("listaResultados");
   
@@ -238,7 +251,7 @@ function renderizarResultados(examesParaRenderizar) {
   });
 }
 
-// Ver detalhes do exame
+
 function verDetalhesExame(idExame) {
   const exame = exames.find(e => e.id === idExame);
   if (!exame) return;
@@ -297,7 +310,6 @@ function verDetalhesExame(idExame) {
   modal.show();
 }
 
-// Adicionar resultado
 function adicionarResultado(idExame) {
   const exame = exames.find(e => e.id === idExame);
   if (!exame) return;
@@ -315,7 +327,6 @@ function adicionarResultado(idExame) {
   }
 }
 
-// Cancelar exame
 function cancelarExame(idExame) {
   if (!confirm("Tem certeza que deseja cancelar este exame?")) return;
   
@@ -327,7 +338,6 @@ function cancelarExame(idExame) {
   }
 }
 
-// Carregar histórico de exames
 function carregarHistoricoExames() {
   const paciente = document.getElementById("pacienteHistorico").value;
   const periodo = document.getElementById("periodoHistorico").value;
@@ -379,7 +389,7 @@ function carregarHistoricoExames() {
   `).join("");
 }
 
-// Função auxiliar para obter classe de status
+
 function getStatusClass(status) {
   const classes = {
     "Aguardando": "bg-warning",
@@ -389,12 +399,10 @@ function getStatusClass(status) {
   return classes[status] || "bg-secondary";
 }
 
-// Imprimir resultado
 function imprimirResultado() {
   window.print();
 }
 
-// Carregar resultados iniciais
 document.addEventListener("DOMContentLoaded", () => {
   renderizarResultados(exames);
 });

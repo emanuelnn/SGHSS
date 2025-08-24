@@ -25,9 +25,7 @@ const tiposProdutos = [
 
 // Categorias de produtos
 const categoriasProdutos = [
-  "Antibióticos", "Anti-inflamatórios", "Analgésicos", "Vacinas", "Material de Curativo",
-  "Seringas", "Agulhas", "Máscaras", "Luvas", "Desinfetantes", "Álcool Gel", "Termômetros",
-  "Estetoscópios", "Material de Laboratório", "Material de Radiologia"
+  "Material Médico", "Material de Enfermagem", "Material de Laboratório", "Material Administrativo"
 ];
 
 // Unidades de medida
@@ -35,6 +33,12 @@ const unidadesMedida = [
   "Unidade", "Caixa", "Frasco", "Pote", "Kit", "Rolos", "Litros", "Mililitros", "Gramas",
   "Miligramas", "Comprimidos", "Ampolas", "Cartuchos", "Seringas", "Bandejas"
 ];
+
+// Tipos de Ganho Financeiro
+const tiposFinanceiro = [
+  "Consulta", "Teleconsulta", "Exame","Internação"
+];
+
 
 // Nomes fictícios (pacientes)
 const nomesPacientes = [
@@ -99,6 +103,12 @@ function gerarSenhaAleatoria(tamanho = 8) {
     chars.charAt(Math.floor(Math.random() * chars.length))
   ).join("");
 }
+
+function valorMonetarioAleatorio() {
+  const valor = Math.floor(Math.random() * (2000 - 100 + 1)) + 50;
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
 
 // Geração de usuários (Pacientes, Médicos, Enfermeiros, Administradores)
 function gerarUsuarios() {
@@ -187,6 +197,32 @@ function gerarUsuarios() {
   return usuarios;
 }
 
+// Gerar dados financeiros
+function gerarFinanceiro() {
+  const financeiro = [];
+  const hoje = new Date();
+  
+  nomesPacientes.forEach((paciente, index) => {
+    const numConsultas = Math.floor(Math.random() * 3) + 1;
+    
+    for (let i = 0; i < numConsultas; i++) {
+      const data = new Date(hoje);
+      data.setDate(hoje.getDate() + Math.floor(Math.random() * 60) + 1);
+      
+      financeiro.push({
+        id: financeiro.length + 1,
+        paciente: paciente,
+        tipo: tiposFinanceiro[Math.floor(Math.random() * tiposFinanceiro.length)],
+        data: data.toISOString().split("T")[0],
+        valor: valorMonetarioAleatorio()
+      });
+    }
+  });
+
+  return financeiro;
+}
+
+
 // Gerar consultas agendadas
 function gerarConsultas() {
   const consultas = [];
@@ -220,12 +256,11 @@ function gerarConsultas() {
   return consultas;
 }
 
-// Gerar exames
+//exames
 function gerarExames() {
   const exames = [];
   
   nomesPacientes.forEach((paciente, index) => {
-    // Gerar 0-2 exames por paciente
     if (Math.random() > 0.6) {
       const tipoExame = tiposExames[Math.floor(Math.random() * tiposExames.length)];
       const dataExame = gerarDataFutura();
@@ -240,6 +275,7 @@ function gerarExames() {
         status: ["Agendado", "Agendado", "Realizado", "Pendente"][Math.floor(Math.random() * 4)],
         resultado: Math.random() > 0.5 ? "Normal" : "Alterado",
         medicoSolicitante: nomesMedicos[Math.floor(Math.random() * nomesMedicos.length)],
+        valor: valorMonetarioAleatorio(),
         observacoes: "",
         dataCadastro: new Date().toISOString()
       });
@@ -249,44 +285,48 @@ function gerarExames() {
   return exames;
 }
 
-// Gerar leitos hospitalares
+//leitos hospitalares
 function gerarLeitos() {
   const leitos = [];
-  const tiposLeito = ["Comum", "UTI", "UTI Neonatal", "UTI Pediátrica", "Enfermaria", "Apartamento"];
-  const statusLeito = ["Ocupado", "Livre", "Manutenção"];
+  const andares = [1, 2, 3, 4, 5];
+  const setores = ["clinico", "cirurgico", "pediatria", "uti", "enfermaria"];
+  const tipos = ["individual", "duplo", "enfermaria"];
   
-  for (let andar = 1; andar <= 6; andar++) {
-    for (let quarto = 1; quarto <= 20; quarto++) {
-      for (let leito = 1; leito <= 4; leito++) {
-        const tipo = tiposLeito[Math.floor(Math.random() * tiposLeito.length)];
-        const status = statusLeito[Math.floor(Math.random() * statusLeito.length)];
+  let id = 1;
+  andares.forEach(andar => {
+    setores.forEach(setor => {
+      const tipo = tipos[Math.floor(Math.random() * tipos.length)];
+      const capacidade = tipo === "individual" ? 1 : tipo === "duplo" ? 2 : 4;
+      
+      for (let i = 0; i < capacidade; i++) {
+        const status = ["Livre", "Ocupado", "Manutenção"][Math.floor(Math.random() * 3)];
+        const paciente = status === "Ocupado" ? nomesPacientes[Math.floor(Math.random() * nomesPacientes.length)] : null;
         
         leitos.push({
-          id: Date.now() + andar * 10000 + quarto * 100 + leito,
-          codigo: `${andar.toString().padStart(2, '0')}${quarto.toString().padStart(2, '0')}${leito}`,
+          id: id++, // use id único
+          numero: `${andar}${String(i + 1).padStart(2, '0')}`,
           andar: andar,
-          quarto: quarto,
+          setor: setor,
           tipo: tipo,
           status: status,
-          paciente: status === "Ocupado" ? nomesPacientes[Math.floor(Math.random() * nomesPacientes.length)] : null,
+          paciente: paciente,
           dataInternacao: status === "Ocupado" ? gerarDataFutura() : null,
           previsaoAlta: status === "Ocupado" ? gerarDataFutura() : null,
           observacoes: status === "Manutenção" ? "Em manutenção preventiva" : "",
           dataCadastro: new Date().toISOString()
         });
       }
-    }
-  }
-  
+    });
+  });
+ 
   return leitos;
 }
 
-// Gerar agendamentos de telemedicina
+//Agendamentos de telemedicina
 function gerarTeleconsultas() {
   const teleconsultas = [];
   
   nomesPacientes.forEach((paciente, index) => {
-    // Gerar 0-2 teleconsultas por paciente
     if (Math.random() > 0.7) {
       const dataConsulta = gerarDataFutura();
       const medico = nomesMedicos[Math.floor(Math.random() * nomesMedicos.length)];
@@ -301,6 +341,7 @@ function gerarTeleconsultas() {
         status: ["Agendado", "Agendado", "Realizado", "Cancelado"][Math.floor(Math.random() * 4)],
         plataforma: ["Zoom", "Google Meet", "Microsoft Teams", "WhatsApp"][Math.floor(Math.random() * 4)],
         linkAcesso: Math.random() > 0.5 ? "https://meet.example.com/room/" + Math.random().toString(36).substr(2, 9) : null,
+        valor: valorMonetarioAleatorio(),
         observacoes: "",
         dataCadastro: new Date().toISOString()
       });
@@ -310,7 +351,7 @@ function gerarTeleconsultas() {
   return teleconsultas;
 }
 
-// Gerar produtos/suprimentos
+//produtos/suprimentos
 function gerarProdutos() {
   const produtos = [];
   
@@ -340,25 +381,20 @@ function gerarProdutos() {
   return produtos;
 }
 
-// Gerar disponibilidade de médicos
+//Disponibilidade de médicos
 function gerarDisponibilidade() {
   const disponibilidade = [];
   
   nomesMedicos.forEach((medico, index) => {
-    // Gerar disponibilidade para os próximos 30 dias
     for (let dia = 0; dia < 30; dia++) {
       const data = new Date();
       data.setDate(data.getDate() + dia);
       
-      // Dias da semana (0=Dom, 6=Sáb)
       const diaSemana = data.getDay();
       
-      // Médicos não trabalham aos domingos
       if (diaSemana !== 0) {
-        // Horários disponíveis
         const horarios = [];
         
-        // Manhã
         if (Math.random() > 0.3) {
           horarios.push({
             dia: "Segunda",
@@ -369,7 +405,6 @@ function gerarDisponibilidade() {
           });
         }
         
-        // Tarde
         if (Math.random() > 0.3) {
           horarios.push({
             dia: "Segunda",
@@ -380,7 +415,6 @@ function gerarDisponibilidade() {
           });
         }
         
-        // Adicionar disponibilidade para cada dia útil
         const diasUteis = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
         const diaUtil = diasUteis[diaSemana - 1];
         
@@ -407,7 +441,6 @@ function gerarDisponibilidade() {
   return disponibilidade;
 }
 
-// Gerar prontuários médicos
 function gerarProntuarios() {
   const prontuarios = [];
   const historicos = [
@@ -460,7 +493,7 @@ function gerarProntuarios() {
   return prontuarios;
 }
 
-// Gerar prescrições médicas
+//Prescrições médicas
 function gerarPrescricoes() {
   const prescricoes = [];
   const medicamentos = [
@@ -477,7 +510,6 @@ function gerarPrescricoes() {
   ];
   
   nomesPacientes.forEach((paciente, index) => {
-    // Gerar 1-3 prescrições por paciente
     const numPrescricoes = Math.floor(Math.random() * 3) + 1;
     
     for (let i = 0; i < numPrescricoes; i++) {
@@ -497,56 +529,50 @@ function gerarPrescricoes() {
   return prescricoes;
 }
 
-// Função principal para popular todos os dados
 function popularTodosDadosFicticios() {
   console.log("🚀 Iniciando população de dados fictícios...");
  
-  // Gerar e salvar usuários
   const usuarios = gerarUsuarios();
   localStorage.setItem("usuarios", JSON.stringify(usuarios));
   console.log(`✅ ${usuarios.length} usuários gerados`);
   
-  // Gerar e salvar consultas
   const consultas = gerarConsultas();
   localStorage.setItem("consultas", JSON.stringify(consultas));
   console.log(`✅ ${consultas.length} consultas agendadas geradas`);
   
-  // Gerar e salvar exames
+  const financeiro = gerarFinanceiro();
+  localStorage.setItem("financeiro", JSON.stringify(financeiro));
+  console.log(`✅ ${financeiro.length} registros financeiros gerados`);
+
   const exames = gerarExames();
   localStorage.setItem("exames", JSON.stringify(exames));
   console.log(`✅ ${exames.length} exames agendados gerados`);
   
-  // Gerar e salvar leitos
   const leitos = gerarLeitos();
   localStorage.setItem("leitos", JSON.stringify(leitos));
   console.log(`✅ ${leitos.length} leitos hospitalares gerados`);
   
-  // Gerar e salvar teleconsultas
   const teleconsultas = gerarTeleconsultas();
   localStorage.setItem("teleconsultas", JSON.stringify(teleconsultas));
   console.log(`✅ ${teleconsultas.length} teleconsultas agendadas geradas`);
   
-  // Gerar e salvar produtos
   const produtos = gerarProdutos();
   localStorage.setItem("produtos", JSON.stringify(produtos));
   console.log(`✅ ${produtos.length} produtos/suprimentos gerados`);
   
-  // Gerar e salvar disponibilidade
   const disponibilidade = gerarDisponibilidade();
   localStorage.setItem("disponibilidade", JSON.stringify(disponibilidade));
   console.log(`✅ ${disponibilidade.length} horários de disponibilidade gerados`);
   
-  // Gerar e salvar prontuários
   const prontuarios = gerarProntuarios();
   localStorage.setItem("prontuarios", JSON.stringify(prontuarios));
   console.log(`✅ ${prontuarios.length} prontuários médicos gerados`);
   
-  // Gerar e salvar prescrições
   const prescricoes = gerarPrescricoes();
   localStorage.setItem("prescricoes", JSON.stringify(prescricoes));
   console.log(`✅ ${prescricoes.length} prescrições médicas geradas`);
-  
-  console.log("🎉 Todos os dados fictícios foram populados com sucesso!");
+
+  console.log("Todos os dados fictícios foram populados com sucesso!");
   
   return {
     usuarios,
@@ -595,6 +621,7 @@ window.inputFicticio = {
   verificarEPopularDados,
   gerarUsuarios,
   gerarConsultas,
+  gerarFinanceiro,
   gerarExames,
   gerarLeitos,
   gerarTeleconsultas,
