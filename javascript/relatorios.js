@@ -39,7 +39,7 @@ function gerarRelatorio() {
 function filtrarTransacoes(periodo, tipoRelatorio) {
   const hoje = new Date();
   let dataInicio = new Date();
-  
+
   // Definir período
   switch (periodo) {
     case "mes":
@@ -55,37 +55,50 @@ function filtrarTransacoes(periodo, tipoRelatorio) {
       dataInicio.setFullYear(hoje.getFullYear() - 1);
       break;
   }
-  
-  let filtradas = financeiro.filter(t => {
+
+  // Filtrar transações
+  const filtradas = financeiro.filter(t => {
     const dataTransacao = new Date(t.data);
     const dentroDoPeriodo = dataTransacao >= dataInicio;
-    const doTipo = tipoRelatorio === "geral" || t.tipo === tipoRelatorio;
-    
+    const doTipo = tipoRelatorio.toLowerCase() === "geral" || t.tipo === tipoRelatorio;
     return dentroDoPeriodo && doTipo;
   });
-  
+
   return filtradas;
 }
 
-// Atualizar métricas
+// Atualização de métricas
 function atualizarMetricas(transacoesFiltradas) {
-  const receitaTotal = transacoesFiltradas.reduce((sum, t) => sum + t.valor, 0);
+  // Converte "R$ 1.840,00" ou "R$1.840,00" -> 1840
+  const valorParaNumero = (valorStr) => {
+    if (!valorStr) return 0;
+    return Number(
+      valorStr
+        .replace(/[R$\s]/g, "")
+        .replace(/\./g, "")
+        .replace(",", ".")
+    ) || 0;
+  };
+
+  const receitaTotal = transacoesFiltradas.reduce((sum, t) => sum + valorParaNumero(t.valor), 0);
+
   const receitaMes = transacoesFiltradas
     .filter(t => {
       const dataTransacao = new Date(t.data);
       const mesAtual = new Date().getMonth();
       return dataTransacao.getMonth() === mesAtual;
     })
-    .reduce((sum, t) => sum + t.valor, 0);
-  
+    .reduce((sum, t) => sum + valorParaNumero(t.valor), 0);
+
   const pacientesUnicos = new Set(transacoesFiltradas.map(t => t.paciente)).size;
   const ticketMedio = pacientesUnicos > 0 ? receitaTotal / pacientesUnicos : 0;
-  
-  document.getElementById("receitaTotal").textContent = `R$ ${receitaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-  document.getElementById("receitaMes").textContent = `R$ ${receitaMes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+  document.getElementById("receitaTotal").textContent = receitaTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  document.getElementById("receitaMes").textContent = receitaMes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   document.getElementById("totalPacientes").textContent = pacientesUnicos;
-  document.getElementById("ticketMedio").textContent = `R$ ${ticketMedio.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+  document.getElementById("ticketMedio").textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
+
 
 // Atualizar gráficos
 function atualizarGraficos(transacoesFiltradas) {

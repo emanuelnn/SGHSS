@@ -13,6 +13,11 @@ let especialidades = [
 const perfil = localStorage.getItem("perfil") || "comum";
 const nomeUsuario = localStorage.getItem("nomeUsuario") || "";
 
+function valorMonetarioAleatorio() {
+  const valor = Math.floor(Math.random() * (2000 - 100 + 1)) + 50;
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
 // Inicialização
 document.addEventListener("DOMContentLoaded", () => {
   popularSelects();
@@ -146,15 +151,15 @@ function agendarConsulta() {
     consultas.push(novaConsulta);
     localStorage.setItem("consultas", JSON.stringify(consultas));
 
-    const financeiro = {
+    const NovaCobranca = {
     id: financeiro.length + 1,
     paciente: paciente,
-    tipo: "Exame",
-    data: dataExame,
+    tipo: "Consulta",
+    data: data,
     valor: valorMonetarioAleatorio()
     };
   
-    financeiro.push(financeiro);
+    financeiro.push(NovaCobranca);
     localStorage.setItem("financeiro", JSON.stringify(financeiro));
   
     const mensagem = document.getElementById("mensagemAgendamento");

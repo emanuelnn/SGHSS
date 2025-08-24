@@ -217,19 +217,19 @@ function internarPaciente(leitoId) {
     previsaoAlta: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   };
 
-      const financeiro = {
-      id: financeiro.length > 0 ? financeiro[financeiro.length - 1].id + 1 : 1,
-      paciente: pacienteNome,
-      tipo: "Internação",
-      data: new Date().toISOString().split('T')[0],
-      valor: valorMonetarioAleatorio()
-      };
-  
-      financeiro.push(financeiro);
-      localStorage.setItem("financeiro", JSON.stringify(financeiro));
-
-
   localStorage.setItem("leitos", JSON.stringify(leitos));
+
+    const NovaCobranca = {
+    id: financeiro.length + 1,
+    paciente: pacienteNome,
+    tipo: "Internação",
+    data: new Date().toISOString().split('T')[0],
+    valor: valorMonetarioAleatorio()
+    };
+  
+    financeiro.push(NovaCobranca);
+    localStorage.setItem("financeiro", JSON.stringify(financeiro));
+
   bootstrap.Modal.getInstance(document.getElementById("leitoModal")).hide();
   atualizarEstatisticas();
   renderizarLeitos();

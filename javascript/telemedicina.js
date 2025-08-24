@@ -15,6 +15,11 @@ const especialidades = [
   "Reumatologia", "Pneumologia", "Nefrologia", "Infectologia", "Oncologia"
 ];
 
+function valorMonetarioAleatorio() {
+  const valor = Math.floor(Math.random() * (2000 - 100 + 1)) + 50;
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
 // Inicialização
 document.addEventListener("DOMContentLoaded", () => {
   popularPacientesMedicos();
@@ -116,16 +121,16 @@ function agendarTeleconsulta() {
   
   teleconsultas.push(novaTeleconsulta);
   localStorage.setItem("teleconsultas", JSON.stringify(teleconsultas));
+ 
+      const NovaCobranca = {
+    id: financeiro.length + 1,
+    paciente: paciente,
+    tipo: "Telemedicina",
+    data: data,
+    valor: valorMonetarioAleatorio()
+    };
   
-        const financeiro = {
-        id: financeiro.length > 0 ? financeiro[financeiro.length - 1].id + 1 : 1,
-        paciente: paciente,
-        tipo: "Telemedicina",
-        data: data,
-        valor: valorMonetarioAleatorio()
-      };
-  
-    financeiro.push(financeiro);
+    financeiro.push(NovaCobranca);
     localStorage.setItem("financeiro", JSON.stringify(financeiro));
 
   // Mostrar mensagem de sucesso

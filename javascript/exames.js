@@ -134,19 +134,19 @@ function agendarExame() {
       dataCadastro: new Date().toISOString()
     };
 
-      const financeiro = {
-        id: financeiro.length + 1,
-        paciente: paciente,
-        tipo: "Exame",
-        data: dataExame,
-        valor: valorMonetarioAleatorio()
-      };
-  
-    financeiro.push(financeiro);
-    localStorage.setItem("financeiro", JSON.stringify(financeiro));
-  
     exames.push(novoExame);
     localStorage.setItem("exames", JSON.stringify(exames));
+    
+    const NovaCobranca = {
+    id: financeiro.length + 1,
+    paciente: paciente,
+    tipo: "Exame",
+    data: dataExame,
+    valor: valorMonetarioAleatorio()
+    };
+  
+    financeiro.push(NovaCobranca);
+    localStorage.setItem("financeiro", JSON.stringify(financeiro));
   
     // Mostrar mensagem de sucesso
     const alerta = document.createElement("div");
