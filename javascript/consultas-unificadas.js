@@ -1,4 +1,8 @@
 // Sistema de consultas unificadas
+
+//Importação de módulos
+const Utils = require("./Utils.js");
+
 let usuarios   = JSON.parse(localStorage.getItem("usuarios")) || [];
 let consultas  = JSON.parse(localStorage.getItem("consultas")) || [];
 let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
@@ -13,12 +17,6 @@ let especialidades = [
 const perfil = localStorage.getItem("perfil") || "comum";
 const nomeUsuario = localStorage.getItem("nomeUsuario") || "";
 
-function valorMonetarioAleatorio() {
-  const valor = Math.floor(Math.random() * (2000 - 100 + 1)) + 50;
-  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
-
-// Inicialização
 document.addEventListener("DOMContentLoaded", () => {
   popularSelects();
   renderPacientes();
@@ -29,15 +27,17 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("filtroConsulta")?.addEventListener("input", renderConsultas);
   document.getElementById("filtroStatus")?.addEventListener("change", renderConsultas);
   document.getElementById("filtroEspecialidade")?.addEventListener("change", renderConsultas);
-  
-  // Data não pode ser menor que a atual
+ 
   const hoje = new Date().toISOString().split("T")[0];
   document.getElementById("dataConsulta")?.setAttribute("min", hoje);
 });
 
-// Popular selects
+function valorMonetarioAleatorio() {
+  const valor = Math.floor(Math.random() * (2000 - 100 + 1)) + 50;
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
 function popularSelects() {
-  //pacientes
   const selectPaciente = document.getElementById("nomePaciente");
   if (selectPaciente) {
     selectPaciente.innerHTML = '<option value="">Selecione o paciente</option>';
@@ -50,7 +50,6 @@ function popularSelects() {
     });
   }
  
-  //especialidades
   const selectEspecialidade = document.getElementById("especialidade");
   if (selectEspecialidade) {
     selectEspecialidade.innerHTML = '<option value="">Selecione a especialidade</option>';
@@ -62,7 +61,6 @@ function popularSelects() {
     });
   }
 
-  //médicos
   const selectMedico = document.getElementById("medico");
   if (selectMedico) {
     selectMedico.innerHTML = '<option value="">Selecione o médico</option>';
@@ -75,7 +73,6 @@ function popularSelects() {
     });
   }
   
-  //horários
   const selectHora = document.getElementById("horaConsulta");
   if (selectHora) {
     selectHora.innerHTML = '<option value="">Selecione o horário</option>';
@@ -88,7 +85,6 @@ function popularSelects() {
     });
   }
   
-  //filtro especialidade
   const filtroEspecialidade = document.getElementById("filtroEspecialidade");
   if (filtroEspecialidade) {
     filtroEspecialidade.innerHTML = '<option value="">Todas as especialidades</option>';
@@ -101,7 +97,6 @@ function popularSelects() {
   }
 }
 
-// Agendar consulta
 function agendarConsulta() {
   const paciente = document.getElementById("nomePaciente").value;
   const especialidade = document.getElementById("especialidade").value;
@@ -112,13 +107,11 @@ function agendarConsulta() {
   const motivo = document.getElementById("motivoConsulta").value;
   const observacoes = document.getElementById("observacoes").value;
   
-  // Validação
   if (!paciente || !especialidade || !data || !hora || !medico) {
     alert("Por favor, preencha todos os campos obrigatórios.");
     return;
   }
   
-  // Validar se a data não é no passado
   const hoje = new Date();
   const dataConsulta = new Date(data + " " + hora);
   if (dataConsulta < hoje) {
@@ -127,7 +120,6 @@ function agendarConsulta() {
   }
   
   if (perfil === "Paciente") {
-    // Pacientes só podem agendar para si mesmos
     if (paciente !== nomeUsuario) {
       alert("Você só pode agendar consultas para si mesmo.");
       return;

@@ -93,6 +93,21 @@ function gerarDataFutura() {
   return dataFutura.toISOString().split("T")[0];
 }
 
+function gerarDataAleatoriaAnoAtual() {
+  const anoAtual = new Date().getFullYear();
+
+  // Gera mês de 0 a 11 (Janeiro a Dezembro)
+  const mes = Math.floor(Math.random() * 12);
+
+  // Define o dia de acordo com o mês (máximo de dias no mês)
+  const ultimoDiaMes = new Date(anoAtual, mes + 1, 0).getDate();
+  const dia = Math.floor(Math.random() * ultimoDiaMes) + 1;
+
+  const dataAleatoria = new Date(anoAtual, mes, dia);
+
+  return dataAleatoria.toISOString().split("T")[0];
+}
+
 function formatarDataBR(dataISO) {
   return dataISO.split("-").reverse().join("/");
 }
@@ -263,7 +278,7 @@ function gerarExames() {
   nomesPacientes.forEach((paciente, index) => {
     if (Math.random() > 0.6) {
       const tipoExame = tiposExames[Math.floor(Math.random() * tiposExames.length)];
-      const dataExame = gerarDataFutura();
+      const dataExame = gerarDataAleatoriaAnoAtual();
       
       exames.push({
         id: Date.now() + index * 1000,
@@ -310,7 +325,7 @@ function gerarLeitos() {
           tipo: tipo,
           status: status,
           paciente: paciente,
-          dataInternacao: status === "Ocupado" ? gerarDataFutura() : null,
+          dataInternacao: status === "Ocupado" ? gerarDataAleatoriaAnoAtual() : null,
           previsaoAlta: status === "Ocupado" ? gerarDataFutura() : null,
           observacoes: status === "Manutenção" ? "Em manutenção preventiva" : "",
           dataCadastro: new Date().toISOString()
@@ -328,7 +343,7 @@ function gerarTeleconsultas() {
   
   nomesPacientes.forEach((paciente, index) => {
     if (Math.random() > 0.7) {
-      const dataConsulta = gerarDataFutura();
+      const dataConsulta = gerarDataAleatoriaAnoAtual();
       const medico = nomesMedicos[Math.floor(Math.random() * nomesMedicos.length)];
       
       teleconsultas.push({
@@ -394,7 +409,7 @@ function gerarDisponibilidade() {
       
       if (diaSemana !== 0) {
         const horarios = [];
-        
+       
         if (Math.random() > 0.3) {
           horarios.push({
             dia: "Segunda",
@@ -517,7 +532,7 @@ function gerarPrescricoes() {
         id: Date.now() + index * 1000 + i,
         paciente: paciente,
         medico: nomesMedicos[Math.floor(Math.random() * nomesMedicos.length)],
-        data: gerarDataFutura(),
+        data: gerarDataAleatoriaAnoAtual(),
         medicamentos: medicamentos[Math.floor(Math.random() * medicamentos.length)],
         diagnostico: ["Gripe", "Infecção urinária", "Hipertensão", "Diabetes", "Dor lombar", "Enxaqueca", "Refluxo", "Asma"][Math.floor(Math.random() * 8)],
         observacoes: "Paciente deve retornar em 15 dias para avaliação",

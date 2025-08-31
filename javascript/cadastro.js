@@ -1,6 +1,5 @@
-function validarCPF(cpf) {
-  return /^\d{11}$/.test(cpf);
-}
+//Importação de módulos
+const Utils = require("./Utils.js");
 
 const perfil = localStorage.getItem("perfil") || "comum";
 const formCadastro = document.getElementById("formCadastro");
@@ -25,6 +24,10 @@ function verificarPermissoes() {
   }
 
   return true;
+}
+
+function validarCPF(cpf) {
+  return /^\d{11}$/.test(cpf);
 }
 
 function renderUsuarios() {
@@ -125,7 +128,7 @@ if (formCadastro) {
       tipoUsuario: document.getElementById("tipoUsuario").value
     };
 
-    if (!validarCPF(novoUsuario.cpf)) {
+    if (validarCPF(novoUsuario.cpf)) {
       alert("CPF inválido. Digite exatamente 11 números.");
       return;
     }

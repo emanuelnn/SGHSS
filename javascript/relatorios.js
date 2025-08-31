@@ -1,3 +1,4 @@
+
 // Relatórios Financeiros
 let consultas = JSON.parse(localStorage.getItem("consultas")) || [];
 let exames = JSON.parse(localStorage.getItem("exames")) || [];
@@ -5,82 +6,104 @@ let teleconsultas = JSON.parse(localStorage.getItem("teleconsultas")) || [];
 let leitos = JSON.parse(localStorage.getItem("leitos")) || [];
 let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
-
 const perfil = localStorage.getItem("perfil") || "comum";
 
-// Inicialização
 document.addEventListener("DOMContentLoaded", () => {
+  
+  // Gerar dados financeiros fictícios se não existirem
+  gerarDadosFinanceirosFicticios();
+ 
   gerarRelatorio();
   
-  // Event listeners
   document.getElementById("periodo")?.addEventListener("change", gerarRelatorio);
   document.getElementById("tipoRelatorio")?.addEventListener("change", gerarRelatorio);
 });
 
-// Gerar relatório
+function valorParaNumero(valorStr) {
+  if (!valorStr) return 0;
+  return Number(
+    valorStr
+      .replace(/[R$\s]/g, "")
+      .replace(/\./g, "")
+      .replace(",", ".")
+  ) || 0;
+}
+
 function gerarRelatorio() {
   const periodo = document.getElementById("periodo")?.value || "mes";
   const tipoRelatorio = document.getElementById("tipoRelatorio")?.value || "geral";
   
-  // Filtrar transações
   let transacoesFiltradas = filtrarTransacoes(periodo, tipoRelatorio);
   
-  // Atualizar métricas
   atualizarMetricas(transacoesFiltradas);
   
-  // Atualizar gráficos
   atualizarGraficos(transacoesFiltradas);
   
-  // Atualizar tabela
   atualizarTabela(transacoesFiltradas);
 }
 
-// Filtrar transações
 function filtrarTransacoes(periodo, tipoRelatorio) {
   const hoje = new Date();
   let dataInicio = new Date();
+  let dataFinal = new Date();
 
-  // Definir período
+  const dataInicialInput = document.getElementById("dataInicial")?.value;
+  const dataFinalInput = document.getElementById("dataFinal")?.value;
+
   switch (periodo) {
+    case "personalizado":
+      if (dataInicialInput) {
+        dataInicio = new Date(dataInicialInput);
+      }
+      if (dataFinalInput) {
+        dataFinal = new Date(dataFinalInput);
+        dataFinal.setHours(23, 59, 59, 999);
+      }
+      break;
     case "mes":
       dataInicio.setMonth(hoje.getMonth() - 1);
+      dataInicio.setDate(1);
       break;
     case "trimestre":
       dataInicio.setMonth(hoje.getMonth() - 3);
+      dataInicio.setDate(1);
       break;
     case "semestre":
       dataInicio.setMonth(hoje.getMonth() - 6);
+      dataInicio.setDate(1);
       break;
     case "ano":
       dataInicio.setFullYear(hoje.getFullYear() - 1);
+      dataInicio.setMonth(0);
+      dataInicio.setDate(1);
       break;
   }
 
-  // Filtrar transações
+  if (!dataFinalInput && periodo !== "personalizado") {
+    dataFinal = new Date();
+  }
+
   const filtradas = financeiro.filter(t => {
     const dataTransacao = new Date(t.data);
-    const dentroDoPeriodo = dataTransacao >= dataInicio;
-    const doTipo = tipoRelatorio.toLowerCase() === "geral" || t.tipo === tipoRelatorio;
+    const dentroDoPeriodo = dataTransacao >= dataInicio && dataTransacao <= dataFinal;
+    const doTipo = tipoRelatorio.toLowerCase() === "geral" || t.tipo.toLowerCase() === tipoRelatorio;
     return dentroDoPeriodo && doTipo;
   });
 
   return filtradas;
 }
 
-// Atualização de métricas
-function atualizarMetricas(transacoesFiltradas) {
-  // Converte "R$ 1.840,00" ou "R$1.840,00" -> 1840
-  const valorParaNumero = (valorStr) => {
-    if (!valorStr) return 0;
-    return Number(
-      valorStr
-        .replace(/[R$\s]/g, "")
-        .replace(/\./g, "")
-        .replace(",", ".")
-    ) || 0;
-  };
+function limparFiltros() {
+  document.getElementById("dataInicial").value = "";
+  document.getElementById("dataFinal").value = "";
+  document.getElementById("periodo").value = "mes";
+  document.getElementById("tipoRelatorio").value = "geral";
+  gerarRelatorio();
+}
 
-  const receitaTotal = transacoesFiltradas.reduce((sum, t) => sum + valorParaNumero(t.valor), 0);
+function atualizarMetricas(transacoesFiltradas) {
+
+  const receitaTotal = transacoesFiltradas.reduce((sum, t) => sum +valorParaNumero(t.valor), 0);
 
   const receitaMes = transacoesFiltradas
     .filter(t => {
@@ -99,29 +122,23 @@ function atualizarMetricas(transacoesFiltradas) {
   document.getElementById("ticketMedio").textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-
-// Atualizar gráficos
 function atualizarGraficos(transacoesFiltradas) {
-  // Gráfico de evolução da receita
   const ctxReceita = document.getElementById("graficoReceita")?.getContext("2d");
   if (ctxReceita) {
-    // Agrupar por mês
     const receitaPorMes = {};
     
     transacoesFiltradas.forEach(t => {
       const data = new Date(t.data);
       const chave = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
-      
-      if (!receitaPorMes[chave]) {
-        receitaPorMes[chave] = 0;
-      }
-      receitaPorMes[chave] += t.valor;
+      if (!receitaPorMes[chave]) receitaPorMes[chave] = 0;
+      receitaPorMes[chave] += valorParaNumero(t.valor);
     });
-    
+   
     const labels = Object.keys(receitaPorMes).sort();
-    const data = labels.map(label => receitaPorMes[label]);
-    
-    new Chart(ctxReceita, {
+    const valores = labels.map(label => receitaPorMes[label]);
+
+    if (window.graficoReceita instanceof Chart) { window.graficoReceita.destroy() };
+    window.graficoReceita = new Chart(ctxReceita, {
       type: 'line',
       data: {
         labels: labels.map(label => {
@@ -130,18 +147,27 @@ function atualizarGraficos(transacoesFiltradas) {
         }),
         datasets: [{
           label: 'Receita',
-          data: data,
+          data: valores,
           borderColor: '#007bff',
           backgroundColor: 'rgba(0, 123, 255, 0.1)',
-          tension: 0.4
+          tension: 0.4,
+          fill: true
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: false
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL'
+                }).format(context.parsed.y);
+              }
+            }
           }
         },
         scales: {
@@ -149,7 +175,10 @@ function atualizarGraficos(transacoesFiltradas) {
             beginAtZero: true,
             ticks: {
               callback: function(value) {
-                return 'R$ ' + value.toLocaleString('pt-BR');
+                return new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL'
+                }).format(value);
               }
             }
           }
@@ -157,29 +186,27 @@ function atualizarGraficos(transacoesFiltradas) {
       }
     });
   }
-  
-  // Gráfico de receita por serviço
+
   const ctxServicos = document.getElementById("graficoServicos")?.getContext("2d");
   if (ctxServicos) {
     const receitaPorServico = {};
-    
     transacoesFiltradas.forEach(t => {
-      if (!receitaPorServico[t.servico]) {
-        receitaPorServico[t.servico] = 0;
-      }
-      receitaPorServico[t.servico] += t.valor;
+      if (!receitaPorServico[t.tipo]) receitaPorServico[t.tipo] = 0;
+      receitaPorServico[t.tipo] += valorParaNumero(t.valor);
     });
     
     const labels = Object.keys(receitaPorServico);
-    const data = Object.values(receitaPorServico);
+    const valores = Object.values(receitaPorServico);
     const colors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8'];
-    
-    new Chart(ctxServicos, {
+
+    if (window.graficoServicos instanceof Chart) { window.graficoServicos.destroy() };
+
+    window.graficoServicos = new Chart(ctxServicos, {
       type: 'doughnut',
       data: {
         labels: labels,
         datasets: [{
-          data: data,
+          data: valores,
           backgroundColor: colors.slice(0, labels.length),
           borderWidth: 2
         }]
@@ -188,8 +215,17 @@ function atualizarGraficos(transacoesFiltradas) {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            position: 'bottom'
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} (${percentage}%)`;
+              }
+            }
           }
         }
       }
@@ -197,28 +233,58 @@ function atualizarGraficos(transacoesFiltradas) {
   }
 }
 
-// Atualizar tabela
+
 function atualizarTabela(transacoesFiltradas) {
   const tbody = document.getElementById("tabelaTransacoes");
   if (!tbody) return;
   
   tbody.innerHTML = "";
   
-  // Ordenar por data (mais recente primeiro)
   const ordenadas = transacoesFiltradas.sort((a, b) => new Date(b.data) - new Date(a.data));
   
   ordenadas.forEach(transacao => {
     const row = document.createElement("tr");
+    const dataTransacao = new Date(transacao.data);
+    const hoje = new Date();
+    const diferencaDias = Math.ceil((hoje - dataTransacao) / (1000 * 60 * 60 * 24));
+    
+    let statusBadge = '';
+    if (diferencaDias < 0) {
+      statusBadge = '<span class="badge bg-warning">Futura</span>';
+    } else if (diferencaDias === 0) {
+      statusBadge = '<span class="badge bg-success">Hoje</span>';
+    } else if (diferencaDias <= 7) {
+      statusBadge = '<span class="badge bg-info">Última semana</span>';
+    } else {
+      statusBadge = '<span class="badge bg-secondary">Antiga</span>';
+    }
 
     row.innerHTML = `
       <td>${formatarData(transacao.data)}</td>
-      <td>${transacao.paciente}</td>
-      <td>${transacao.tipo}</td>
-      <td>R$ ${transacao.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
       <td>
-        <button class="btn btn-sm btn-outline-primary" onclick="verDetalheTransacao(${transacao.id})">
-          <i class="fas fa-eye"></i>
-        </button>
+        <div class="d-flex align-items-center">
+          <i class="fas fa-user-circle me-2 text-muted"></i>
+          ${transacao.paciente}
+        </div>
+      </td>
+      <td>
+        <span class="badge bg-primary">${transacao.tipo}</span>
+      </td>
+      <td>
+        <strong class="text-success">R$ ${transacao.valor}</strong>
+      </td>
+      <td>
+        ${statusBadge}
+      </td>
+      <td>
+        <div class="btn-group" role="group">
+          <button class="btn btn-sm btn-outline-primary" onclick="verDetalheTransacao(${transacao.id})" title="Ver detalhes">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="exportarTransacao(${transacao.id})" title="Exportar">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
       </td>
     `;
     
@@ -226,48 +292,78 @@ function atualizarTabela(transacoesFiltradas) {
   });
   
   if (ordenadas.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Nenhuma transação encontrada</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Nenhuma transação encontrada</td></tr>';
   }
 }
 
-// Ver detalhe da transação
 function verDetalheTransacao(id) {
-  const financeiro = financeiro.find(t => t.id === id);
+  const transacao = financeiro.find(t => t.id === id);
   
-  if (!transacao) return;
+  if (!transacao) {
+    alert("Transação não encontrada.");
+    return;
+  }
   
   alert(`Detalhes da Transação:\n\n` +
-        `Paciente: ${financeiro.paciente}\n` +
-        `Serviço: ${financeiro.tipo}\n` +
-        `Valor: R$ ${financeiro.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\n` +
-        `Data: ${formatarData(financeiro.data)}\n`);
+        `ID: ${transacao.id}\n` +
+        `Paciente: ${transacao.paciente}\n` +
+        `Serviço: ${transacao.tipo}\n` +
+        `Valor: R$ ${transacao.valor}\n` +
+        `Data: ${formatarData(transacao.data)}\n`);
 }
 
-// Exportar PDF
+function exportarTransacao(id) {
+  const transacao = financeiro.find(t => t.id === id);
+  if (!transacao) return;
+  
+  const csv = `Data;Paciente;Serviço;Valor\n` +
+              `${formatarData(transacao.data)};${transacao.paciente};${transacao.tipo};R$ ${transacao.valor}`;
+  
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute("href", url);
+  link.setAttribute("download", `transacao_${transacao.id}_${transacao.paciente.replace(/\s+/g, '_')}.csv`);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 function exportarPDF() {
   alert("Exportação para PDF em desenvolvimento. Esta funcionalidade será implementada em breve.");
 }
 
-// Exportar Excel
 function exportarExcel() {
   alert("Exportação para Excel em desenvolvimento. Esta funcionalidade será implementada em breve.");
 }
 
-// Exportar CSV
 function exportarCSV() {
   const periodo = document.getElementById("periodo")?.value || "mes";
   const tipoRelatorio = document.getElementById("tipoRelatorio")?.value || "geral";
   
   const transacoesFiltradas = filtrarTransacoes(periodo, tipoRelatorio);
   
-  // Criar CSV
-  let csv = "Data;Paciente;Serviço;Valor;Descrição\n";
+  let csv = "Data;Paciente;Serviço;Valor;Status\n";
  
   transacoesFiltradas.forEach(t => {
-    csv += `${formatarData(t.data)};${t.paciente};${t.tipo};R$ ${t.valor};${t.descricao}\n`;
+    csv += `${formatarData(t.data)};${t.paciente};${t.tipo};R$ ${t.valor};let status = '';
+    const dataTransacao = new Date(t.data);
+    const hoje = new Date();
+    const diferencaDias = Math.ceil((hoje - dataTransacao) / (1000 * 60 * 60 * 24));
+    
+    if (diferencaDias < 0) {
+      status = 'Futura';
+    } else if (diferencaDias === 0) {
+      status = 'Hoje';
+    } else if (diferencaDias <= 7) {
+      status = 'Última semana';
+    } else {
+      status = 'Antiga';
+    }\n`;
   });
-  
-  // Criar blob e download
+ 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement("a");
   const url = URL.createObjectURL(blob);
@@ -281,7 +377,6 @@ function exportarCSV() {
   document.body.removeChild(link);
 }
 
-// Formatar data
 function formatarData(dataString) {
   if (!dataString) return "Não informada";
   

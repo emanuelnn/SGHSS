@@ -23,30 +23,47 @@
       </div>
       <div class="filter-section">
         <div class="row">
-          <div class="col-md-3">
+          <div class="col-md-2">
+            <label class="form-label">Data Inicial</label>
+            <input type="date" id="dataInicial" class="form-control" onchange="gerarRelatorio()">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Data Final</label>
+            <input type="date" id="dataFinal" class="form-control" onchange="gerarRelatorio()">
+          </div>
+          <div class="col-md-2">
             <label class="form-label">Período</label>
             <select id="periodo" class="form-select" onchange="gerarRelatorio()">
+              <option value="personalizado">Personalizado</option>
               <option value="mes">Mês Atual</option>
               <option value="trimestre">Trimestre</option>
               <option value="semestre">Semestre</option>
               <option value="ano">Ano</option>
             </select>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-2">
             <label class="form-label">Tipo de Relatório</label>
             <select id="tipoRelatorio" class="form-select" onchange="gerarRelatorio()">
               <option value="geral">Geral</option>
-              <option value="consultas">Consulta</option>
-              <option value="exames">Exame</option>
-              <option value="internacoes">Internação</option>
+              <option value="consulta">Consulta</option>
+              <option value="exame">Exame</option>
+              <option value="internacao">Internação</option>
               <option value="telemedicina">Telemedicina</option>
             </select>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-2">
             <label class="form-label">&nbsp;</label>
             <div class="d-grid">
               <button class="btn btn-primary" onclick="gerarRelatorio()">
                 <i class="fas fa-sync me-1"></i>Atualizar
+              </button>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">&nbsp;</label>
+            <div class="d-grid">
+              <button class="btn btn-outline-secondary" onclick="limparFiltros()">
+                <i class="fas fa-eraser me-1"></i>Limpar
               </button>
             </div>
           </div>
@@ -120,6 +137,7 @@
                 <th>Paciente</th>
                 <th>Serviço</th>
                 <th>Valor</th>
+                <th>Status</th>
                 <th>Ações</th>
               </tr>
             </thead>
