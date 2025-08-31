@@ -21,160 +21,167 @@
         </a>
       </div>
 
-      <ul class="nav nav-tabs" id="disponibilidadeTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="disponibilidade-tab" data-bs-toggle="tab" data-bs-target="#disponibilidade" type="button" role="tab">
-            <i class="fas fa-clock me-1"></i>Disponibilidade
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="qualificacoes-tab" data-bs-toggle="tab" data-bs-target="#qualificacoes" type="button" role="tab">
-            <i class="fas fa-certificate me-1"></i>Qualificações
-          </button>
-        </li>
-      </ul>
+      <div class="alert alert-info" id="acessoRestrito" style="display: none;">
+            <i class="fas fa-lock me-2"></i>
+            Acesso restrito: apenas a equipe Médica e Administradores podem acessar o calendário de Disponibilidade.
+      </div>
 
-      <div class="tab-content mt-3">
-        <div class="tab-pane fade show active" id="disponibilidade" role="tabpanel">
-          <div class="row">
-            <div class="col-md-8">
-              <div class="calendar-container">
-                <div class="calendar-header">
-                  <button class="btn btn-sm btn-outline-primary" onclick="previousMonth()">
-                    <i class="fas fa-chevron-left"></i>
-                  </button>
-                  <h5 id="currentMonth"></h5>
-                  <button class="btn btn-sm btn-outline-primary" onclick="nextMonth()">
-                    <i class="fas fa-chevron-right"></i>
-                  </button>
-                </div>
-                <div class="calendar-grid" id="calendarGrid">
-                </div>
-              </div>
-            </div>
-            
-            <div class="col-md-4">
-              <div class="card">
-                <div class="card-header">
-                  <h6 class="mb-0">Configurar Disponibilidade</h6>
-                </div>
-                <div class="card-body">
-                  <div class="mb-3">
-                    <label class="form-label">Profissional</label>
-                    <select id="profissionalSelect" class="form-select" onchange="carregarDisponibilidade()">
-                      <option value="">Selecione o profissional</option>
-                    </select>
-                  </div>
-                  
-                  <div class="mb-3">
-                    <label class="form-label">Data Selecionada</label>
-                    <input type="text" id="dataSelecionada" class="form-control" readonly>
-                  </div>
-                  
-                  <div class="mb-3">
-                    <label class="form-label">Horários Disponíveis</label>
-                    <div class="time-slots" id="timeSlots">
-                    </div>
-                  </div>
-                  
-                  <div class="d-grid gap-2">
-                    <button class="btn btn-success" onclick="salvarDisponibilidade()">
-                      <i class="fas fa-save me-1"></i>Salvar Disponibilidade
+      <div id="disponibilidade_tab">
+        <ul class="nav nav-tabs" id="disponibilidadeTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="disponibilidade-tab" data-bs-toggle="tab" data-bs-target="#disponibilidade" type="button" role="tab">
+              <i class="fas fa-clock me-1"></i>Disponibilidade
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="qualificacoes-tab" data-bs-toggle="tab" data-bs-target="#qualificacoes" type="button" role="tab">
+              <i class="fas fa-certificate me-1"></i>Qualificações
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content mt-3">
+          <div class="tab-pane fade show active" id="disponibilidade" role="tabpanel">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="calendar-container">
+                  <div class="calendar-header">
+                    <button class="btn btn-sm btn-outline-primary" onclick="previousMonth()">
+                      <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button class="btn btn-outline-secondary" onclick="limparDisponibilidade()">
-                      <i class="fas fa-eraser me-1"></i>Limpar Dia
+                    <h5 id="currentMonth"></h5>
+                    <button class="btn btn-sm btn-outline-primary" onclick="nextMonth()">
+                      <i class="fas fa-chevron-right"></i>
                     </button>
                   </div>
+                  <div class="calendar-grid" id="calendarGrid">
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-        <div class="tab-pane fade" id="qualificacoes" role="tabpanel">
-          <div class="row">
-            <div class="col-md-4">
-              <div class="card">
-                <div class="card-header">
-                  <h6 class="mb-0">Profissionais</h6>
-                </div>
-                <div class="card-body">
-                  <div class="mb-3">
-                    <input type="text" id="filtroProfissional" class="form-control" placeholder="Buscar profissional..." oninput="filtrarProfissionais()">
+              
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0">Configurar Disponibilidade</h6>
                   </div>
-                  <ul id="listaProfissionais" class="list-group">
-                  </ul>
-                </div>
-              </div>
-            </div>
-            
-            <div class="col-md-8">
-              <div class="card">
-                <div class="card-header">
-                  <h6 class="mb-0">Qualificações do Profissional</h6>
-                </div>
-                <div class="card-body">
-                  <div id="infoProfissional" class="text-center text-muted mb-4">
-                    <i class="fas fa-user-md fa-3x mb-3"></i>
-                    <p>Selecione um profissional para ver suas qualificações</p>
-                  </div>
-                  
-                  <div id="formQualificacoes" style="display: none;">
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="mb-3">
-                          <label class="form-label">Formação Acadêmica</label>
-                          <textarea id="formacao" class="form-control" rows="3" placeholder="Graduação, Especialização, Residência, etc."></textarea>
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="mb-3">
-                          <label class="form-label">Experiência Profissional</label>
-                          <textarea id="experiencia" class="form-control" rows="3" placeholder="Experiência profissional anterior, cargos, etc."></textarea>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="mb-3">
-                          <label class="form-label">Especialidades</label>
-                          <div id="listaEspecialidades">
-                          </div>
-                          <div class="input-group mt-2">
-                            <input type="text" id="novaEspecialidade" class="form-control" placeholder="Nova especialidade">
-                            <button class="btn btn-outline-primary" onclick="adicionarEspecialidade()">
-                              <i class="fas fa-plus"></i>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="mb-3">
-                          <label class="form-label">Certificações</label>
-                          <div id="listaCertificacoes">
-                          </div>
-                          <div class="input-group mt-2">
-                            <input type="text" id="novaCertificacao" class="form-control" placeholder="Nova certificação">
-                            <button class="btn btn-outline-primary" onclick="adicionarCertificacao()">
-                              <i class="fas fa-plus"></i>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+                  <div class="card-body">
+                    <div class="mb-3">
+                      <label class="form-label">Profissional</label>
+                      <select id="profissionalSelect" class="form-select" onchange="carregarDisponibilidade()">
+                        <option value="">Selecione o profissional</option>
+                      </select>
                     </div>
                     
                     <div class="mb-3">
-                      <label class="form-label">Observações</label>
-                      <textarea id="observacoesQualificacoes" class="form-control" rows="2" placeholder="Outras informações relevantes"></textarea>
+                      <label class="form-label">Data Selecionada</label>
+                      <input type="text" id="dataSelecionada" class="form-control" readonly>
                     </div>
                     
-                    <div class="d-flex gap-2">
-                      <button class="btn btn-success" onclick="salvarQualificacoes()">
-                        <i class="fas fa-save me-1"></i>Salvar
+                    <div class="mb-3">
+                      <label class="form-label">Horários Disponíveis</label>
+                      <div class="time-slots" id="timeSlots">
+                      </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                      <button class="btn btn-success" onclick="salvarDisponibilidade()">
+                        <i class="fas fa-save me-1"></i>Salvar Disponibilidade
                       </button>
-                      <button class="btn btn-secondary" onclick="cancelarEdicao()">
-                        <i class="fas fa-times me-1"></i>Cancelar
+                      <button class="btn btn-outline-secondary" onclick="limparDisponibilidade()">
+                        <i class="fas fa-eraser me-1"></i>Limpar Dia
                       </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="qualificacoes" role="tabpanel">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0">Profissionais</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="mb-3">
+                      <input type="text" id="filtroProfissional" class="form-control" placeholder="Buscar profissional..." oninput="filtrarProfissionais()">
+                    </div>
+                    <ul id="listaProfissionais" class="list-group">
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-8">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0">Qualificações do Profissional</h6>
+                  </div>
+                  <div class="card-body">
+                    <div id="infoProfissional" class="text-center text-muted mb-4">
+                      <i class="fas fa-user-md fa-3x mb-3"></i>
+                      <p>Selecione um profissional para ver suas qualificações</p>
+                    </div>
+                    
+                    <div id="formQualificacoes" style="display: none;">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="mb-3">
+                            <label class="form-label">Formação Acadêmica</label>
+                            <textarea id="formacao" class="form-control" rows="3" placeholder="Graduação, Especialização, Residência, etc."></textarea>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="mb-3">
+                            <label class="form-label">Experiência Profissional</label>
+                            <textarea id="experiencia" class="form-control" rows="3" placeholder="Experiência profissional anterior, cargos, etc."></textarea>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="mb-3">
+                            <label class="form-label">Especialidades</label>
+                            <div id="listaEspecialidades">
+                            </div>
+                            <div class="input-group mt-2">
+                              <input type="text" id="novaEspecialidade" class="form-control" placeholder="Nova especialidade">
+                              <button class="btn btn-outline-primary" onclick="adicionarEspecialidade()">
+                                <i class="fas fa-plus"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="mb-3">
+                            <label class="form-label">Certificações</label>
+                            <div id="listaCertificacoes">
+                            </div>
+                            <div class="input-group mt-2">
+                              <input type="text" id="novaCertificacao" class="form-control" placeholder="Nova certificação">
+                              <button class="btn btn-outline-primary" onclick="adicionarCertificacao()">
+                                <i class="fas fa-plus"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <label class="form-label">Observações</label>
+                        <textarea id="observacoesQualificacoes" class="form-control" rows="2" placeholder="Outras informações relevantes"></textarea>
+                      </div>
+                      
+                      <div class="d-flex gap-2">
+                        <button class="btn btn-success" onclick="salvarQualificacoes()">
+                          <i class="fas fa-save me-1"></i>Salvar
+                        </button>
+                        <button class="btn btn-secondary" onclick="cancelarEdicao()">
+                          <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -183,11 +190,7 @@
           </div>
         </div>
       </div>
-      <div class="text-center mt-4">
-        <a href="dashboard.html" class="btn btn-secondary">
-          <i class="fas fa-arrow-left me-1"></i>Voltar ao Menu Principal
-        </a>
-      </div>
+
     </div>
   </div>
 

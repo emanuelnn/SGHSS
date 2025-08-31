@@ -9,9 +9,29 @@ let profissionalSelecionado = null;
 let dataSelecionada = null;
 let mesAtual = new Date();
 let anoAtual = new Date();
+const perfil = localStorage.getItem("perfil") || "comum";
+const acessoRestrito = document.getElementById("acessoRestrito");
+const disponibilidade_tab = document.getElementById("disponibilidade_tab");
+
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Téc. de Enfermagem";
+  // Restringir acesso ao formulário de Disponibilidade
+  if (!ehAdministrador || !ehMedico || !ehEnfermeiro) {
+      if (disponibilidade_tab) {
+        disponibilidade_tab.style.display = "none";
+      }
+      if (acessoRestrito) {
+        acessoRestrito.style.display = "block";
+      }
+  }
+  return true;
+}
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
+  verificarPermissoes();
   carregarProfissionais();
   renderizarCalendario();
   carregarQualificacoes();

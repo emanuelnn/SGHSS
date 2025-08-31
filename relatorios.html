@@ -21,131 +21,142 @@
           <i class="fas fa-arrow-left me-1"></i>Voltar ao Menu
         </a>
       </div>
-      <div class="filter-section">
-        <div class="row">
-          <div class="col-md-2">
-            <label class="form-label">Data Inicial</label>
-            <input type="date" id="dataInicial" class="form-control" onchange="gerarRelatorio()">
+
+      <div class="alert alert-info" id="acessoRestrito" style="display: none;">
+            <i class="fas fa-lock me-2"></i>
+            Acesso restrito: apenas a equipe Médica e Administradores podem acessar o calendário de Disponibilidade.
+      </div>
+
+      <div id="relatorios_tab">
+
+        <div class="filter-section">
+          <div class="row">
+            <div class="col-md-2">
+              <label class="form-label">Data Inicial</label>
+              <input type="date" id="dataInicial" class="form-control" onchange="gerarRelatorio()">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Data Final</label>
+              <input type="date" id="dataFinal" class="form-control" onchange="gerarRelatorio()">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Período</label>
+              <select id="periodo" class="form-select" onchange="gerarRelatorio()">
+                <option value="personalizado">Personalizado</option>
+                <option value="mes">Mês Atual</option>
+                <option value="trimestre">Trimestre</option>
+                <option value="semestre">Semestre</option>
+                <option value="ano">Ano</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Tipo de Relatório</label>
+              <select id="tipoRelatorio" class="form-select" onchange="gerarRelatorio()">
+                <option value="geral">Geral</option>
+                <option value="consulta">Consulta</option>
+                <option value="exame">Exame</option>
+                <option value="internacao">Internação</option>
+                <option value="telemedicina">Telemedicina</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">&nbsp;</label>
+              <div class="d-grid">
+                <button class="btn btn-primary" onclick="gerarRelatorio()">
+                  <i class="fas fa-sync me-1"></i>Atualizar
+                </button>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">&nbsp;</label>
+              <div class="d-grid">
+                <button class="btn btn-outline-secondary" onclick="limparFiltros()">
+                  <i class="fas fa-eraser me-1"></i>Limpar
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="col-md-2">
-            <label class="form-label">Data Final</label>
-            <input type="date" id="dataFinal" class="form-control" onchange="gerarRelatorio()">
+        </div>
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="metric-card">
+              <div class="metric-value" id="receitaTotal">R$ 0</div>
+              <div class="metric-label">Receita Total</div>
+            </div>
           </div>
-          <div class="col-md-2">
-            <label class="form-label">Período</label>
-            <select id="periodo" class="form-select" onchange="gerarRelatorio()">
-              <option value="personalizado">Personalizado</option>
-              <option value="mes">Mês Atual</option>
-              <option value="trimestre">Trimestre</option>
-              <option value="semestre">Semestre</option>
-              <option value="ano">Ano</option>
-            </select>
+          <div class="col-md-3">
+            <div class="metric-card">
+              <div class="metric-value" id="receitaMes">R$ 0</div>
+              <div class="metric-label">Receita Mês</div>
+            </div>
           </div>
-          <div class="col-md-2">
-            <label class="form-label">Tipo de Relatório</label>
-            <select id="tipoRelatorio" class="form-select" onchange="gerarRelatorio()">
-              <option value="geral">Geral</option>
-              <option value="consulta">Consulta</option>
-              <option value="exame">Exame</option>
-              <option value="internacao">Internação</option>
-              <option value="telemedicina">Telemedicina</option>
-            </select>
+          <div class="col-md-3">
+            <div class="metric-card">
+              <div class="metric-value" id="totalPacientes">0</div>
+              <div class="metric-label">Pacientes Ativos</div>
+            </div>
           </div>
-          <div class="col-md-2">
-            <label class="form-label">&nbsp;</label>
-            <div class="d-grid">
-              <button class="btn btn-primary" onclick="gerarRelatorio()">
-                <i class="fas fa-sync me-1"></i>Atualizar
+          <div class="col-md-3">
+            <div class="metric-card">
+              <div class="metric-value" id="ticketMedio">R$ 0</div>
+              <div class="metric-label">Ticket Médio</div>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-4">
+          <div class="col-md-8">
+            <div class="report-card">
+              <h5 class="mb-3">Evolução da Receita</h5>
+              <div class="chart-container">
+                <canvas id="graficoReceita"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="report-card">
+              <h5 class="mb-3">Receita por Serviço</h5>
+              <div class="chart-container">
+                <canvas id="graficoServicos"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="report-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Transações Recentes</h5>
+            <div class="export-buttons">
+              <button class="btn btn-outline-primary btn-sm" onclick="exportarPDF()">
+                <i class="fas fa-file-pdf me-1"></i>PDF
+              </button>
+              <button class="btn btn-outline-success btn-sm" onclick="exportarExcel()">
+                <i class="fas fa-file-excel me-1"></i>Excel
+              </button>
+              <button class="btn btn-outline-info btn-sm" onclick="exportarCSV()">
+                <i class="fas fa-file-csv me-1"></i>CSV
               </button>
             </div>
           </div>
-          <div class="col-md-2">
-            <label class="form-label">&nbsp;</label>
-            <div class="d-grid">
-              <button class="btn btn-outline-secondary" onclick="limparFiltros()">
-                <i class="fas fa-eraser me-1"></i>Limpar
-              </button>
-            </div>
+          
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Paciente</th>
+                  <th>Serviço</th>
+                  <th>Valor</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaTransacoes">
+              </tbody>
+            </table>
           </div>
         </div>
+
       </div>
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-value" id="receitaTotal">R$ 0</div>
-            <div class="metric-label">Receita Total</div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-value" id="receitaMes">R$ 0</div>
-            <div class="metric-label">Receita Mês</div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-value" id="totalPacientes">0</div>
-            <div class="metric-label">Pacientes Ativos</div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="metric-card">
-            <div class="metric-value" id="ticketMedio">R$ 0</div>
-            <div class="metric-label">Ticket Médio</div>
-          </div>
-        </div>
-      </div>
-      <div class="row mb-4">
-        <div class="col-md-8">
-          <div class="report-card">
-            <h5 class="mb-3">Evolução da Receita</h5>
-            <div class="chart-container">
-              <canvas id="graficoReceita"></canvas>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="report-card">
-            <h5 class="mb-3">Receita por Serviço</h5>
-            <div class="chart-container">
-              <canvas id="graficoServicos"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="report-card">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="mb-0">Transações Recentes</h5>
-          <div class="export-buttons">
-            <button class="btn btn-outline-primary btn-sm" onclick="exportarPDF()">
-              <i class="fas fa-file-pdf me-1"></i>PDF
-            </button>
-            <button class="btn btn-outline-success btn-sm" onclick="exportarExcel()">
-              <i class="fas fa-file-excel me-1"></i>Excel
-            </button>
-            <button class="btn btn-outline-info btn-sm" onclick="exportarCSV()">
-              <i class="fas fa-file-csv me-1"></i>CSV
-            </button>
-          </div>
-        </div>
-        
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Paciente</th>
-                <th>Serviço</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tabelaTransacoes">
-            </tbody>
-          </table>
-        </div>
-      </div>
+      
     </div>
   </div>
 

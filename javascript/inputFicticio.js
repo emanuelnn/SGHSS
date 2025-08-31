@@ -173,7 +173,7 @@ function gerarUsuarios() {
       email: nome.toLowerCase().replace(/\s+/g, ".") + "@enfermeiro.com",
       telefone: gerarTelefone(),
       senha: gerarSenhaAleatoria(),
-      tipoUsuario: "Enfermeiro",
+      tipoUsuario: "Tec. Enfermagem",
       coren: String(Math.floor(Math.random() * 900000) + 100000),
       ativo: true,
       dataCadastro: new Date().toISOString()
@@ -202,13 +202,26 @@ function gerarUsuarios() {
       email: "coordenadora@hospital.com",
       telefone: "(11) 99999-1111",
       senha: "enfermeiro123",
-      tipoUsuario: "Enfermeiro",
-      coren: "SP123456",
+      tipoUsuario: "Tec. Enfermagem",
+      coren: "123456",
+      ativo: true,
+      dataCadastro: new Date().toISOString()
+    },
+    {
+      id: Date.now() + nomesPacientes.length + nomesMedicos.length + nomesEnfermeiros.length + 2,
+      nome: "Paciente Teste",
+      cpf: "222222222222",
+      nascimento: "1985-03-15",
+      email: "N/A",
+      telefone: "(11) 99999-2222",
+      senha: "paciente123",
+      tipoUsuario: "Paciente",
+      coren: "N/A",
       ativo: true,
       dataCadastro: new Date().toISOString()
     }
   );
-  
+
   return usuarios;
 }
 

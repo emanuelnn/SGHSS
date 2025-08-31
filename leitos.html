@@ -22,90 +22,98 @@
         </a>
       </div>
 
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="stats-card text-center">
-            <div class="stats-number text-success" id="totalLeitos">0</div>
-            <div class="stats-label">Total de Leitos</div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stats-card text-center">
-            <div class="stats-number text-danger" id="leitosOcupados">0</div>
-            <div class="stats-label">Ocupados</div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stats-card text-center">
-            <div class="stats-number text-success" id="leitosDisponiveis">0</div>
-            <div class="stats-label">Disponíveis</div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stats-card text-center">
-            <div class="stats-number text-warning" id="taxaOcupacao">0%</div>
-            <div class="stats-label">Taxa de Ocupação</div>
-          </div>
-        </div>
+      <div class="alert alert-info" id="acessoRestrito" style="display: none;">
+            <i class="fas fa-lock me-2"></i>
+            Acesso restrito: apenas a equipe Médica e Administradores podem acessar o calendário de Disponibilidade.
       </div>
 
-      <div class="filter-section">
-        <div class="row">
+      <div id="leitos_tab" class="mb-4">
+        <!--Estatísticas-->
+        <div class="row mb-4">
           <div class="col-md-3">
-            <label class="form-label">Andar</label>
-            <select id="filtroAndar" class="form-select" onchange="filtrarLeitos()">
-              <option value="">Todos os andares</option>
-              <option value="1">1º Andar</option>
-              <option value="2">2º Andar</option>
-              <option value="3">3º Andar</option>
-              <option value="4">4º Andar</option>
-              <option value="5">5º Andar</option>
-            </select>
+            <div class="stats-card text-center">
+              <div class="stats-number text-success" id="totalLeitos">0</div>
+              <div class="stats-label">Total de Leitos</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label">Setor</label>
-            <select id="filtroSetor" class="form-select" onchange="filtrarLeitos()">
-              <option value="">Todos os setores</option>
-              <option value="clinico">Clínico</option>
-              <option value="cirurgico">Cirúrgico</option>
-              <option value="pediatria">Pediatria</option>
-              <option value="uti">UTI</option>
-              <option value="enfermaria">Enfermaria</option>
-            </select>
+            <div class="stats-card text-center">
+              <div class="stats-number text-danger" id="leitosOcupados">0</div>
+              <div class="stats-label">Ocupados</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label">Status</label>
-            <select id="filtroStatus" class="form-select" onchange="filtrarLeitos()">
-              <option value="">Todos os status</option>
-              <option value="Livre">Livre</option>
-              <option value="Ocupado">Ocupado</option>
-              <option value="Manutenção">Manutenção</option>
-            </select>
+            <div class="stats-card text-center">
+              <div class="stats-number text-success" id="leitosDisponiveis">0</div>
+              <div class="stats-label">Disponíveis</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label">&nbsp;</label>
-            <div class="d-grid">
-              <button class="btn btn-outline-primary" onclick="limparFiltros()">
-                <i class="fas fa-refresh me-1"></i>Limpar Filtros
-              </button>
+            <div class="stats-card text-center">
+              <div class="stats-number text-warning" id="taxaOcupacao">0%</div>
+              <div class="stats-label">Taxa de Ocupação</div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="leito-grid" id="leitoGrid">
-      </div>
-      <div class="modal fade" id="leitoModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="modalTitle">Detalhes do Leito</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <!--Leitos-->
+        <div class="filter-section">
+          <div class="row">
+            <div class="col-md-3">
+              <label class="form-label">Andar</label>
+              <select id="filtroAndar" class="form-select" onchange="filtrarLeitos()">
+                <option value="">Todos os andares</option>
+                <option value="1">1º Andar</option>
+                <option value="2">2º Andar</option>
+                <option value="3">3º Andar</option>
+                <option value="4">4º Andar</option>
+                <option value="5">5º Andar</option>
+              </select>
             </div>
-            <div class="modal-body" id="modalBody">
+            <div class="col-md-3">
+              <label class="form-label">Setor</label>
+              <select id="filtroSetor" class="form-select" onchange="filtrarLeitos()">
+                <option value="">Todos os setores</option>
+                <option value="clinico">Clínico</option>
+                <option value="cirurgico">Cirúrgico</option>
+                <option value="pediatria">Pediatria</option>
+                <option value="uti">UTI</option>
+                <option value="enfermaria">Enfermaria</option>
+              </select>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-              <button type="button" class="btn btn-primary" id="btnAcaoLeito">Ação</button>
+            <div class="col-md-3">
+              <label class="form-label">Status</label>
+              <select id="filtroStatus" class="form-select" onchange="filtrarLeitos()">
+                <option value="">Todos os status</option>
+                <option value="Livre">Livre</option>
+                <option value="Ocupado">Ocupado</option>
+                <option value="Manutenção">Manutenção</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">&nbsp;</label>
+              <div class="d-grid">
+                <button class="btn btn-outline-primary" onclick="limparFiltros()">
+                  <i class="fas fa-refresh me-1"></i>Limpar Filtros
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="leito-grid" id="leitoGrid">
+        </div>
+        <div class="modal fade" id="leitoModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Detalhes do Leito</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body" id="modalBody">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="btnAcaoLeito">Ação</button>
+              </div>
             </div>
           </div>
         </div>

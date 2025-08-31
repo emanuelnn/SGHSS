@@ -4,6 +4,28 @@ let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
 
 const perfisValidos = ["Livre", "Ocupado", "Manutenção"];
 const perfil = localStorage.getItem("perfil") || "comum";
+const leitos_tab = document.getElementById("leitos_tab");
+const acessoRestrito = document.getElementById("acessoRestrito");
+
+// Verificar permissões de acesso
+// Verificar permissões de acesso
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Tec. de Enfermagem";
+
+  // Restringir acesso ao formulário de Leitos
+  if (!ehAdministrador || !ehMedico || !ehEnfermeiro) {
+    if (leitos_tab) {
+      leitos_tab.style.display = "none";
+    }
+    if (acessoRestrito) {
+      acessoRestrito.style.display = "block";
+    }
+  }
+
+  return true;
+}
 
 function valorMonetarioAleatorio() {
   const valor = Math.floor(Math.random() * (2000 - 100 + 1)) + 50;
@@ -11,6 +33,7 @@ function valorMonetarioAleatorio() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  verificarPermissoes();
   atualizarEstatisticas();
   renderizarLeitos();
 

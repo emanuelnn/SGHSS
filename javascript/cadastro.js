@@ -1,6 +1,3 @@
-//Importação de módulos
-const Utils = require("./Utils.js");
-
 const perfil = localStorage.getItem("perfil") || "comum";
 const formCadastro = document.getElementById("formCadastro");
 const acessoRestrito = document.getElementById("acessoRestrito");
@@ -10,7 +7,7 @@ const btnSalvar = document.getElementById("btnSalvar");
 function verificarPermissoes() {
   const ehAdministrador = perfil === "Administrador";
 
-  // Restringir acesso ao formulário de cadastro
+  // Restringir acesso ao formulário de Cadastro
   if (!ehAdministrador) {
     if (formCadastro) {
       formCadastro.style.display = "none";

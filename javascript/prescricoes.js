@@ -7,8 +7,27 @@ const lista = document.getElementById("listaPrescricoes");
 
 const filtroPaciente = document.getElementById("filtroPaciente");
 const filtroMedico = document.getElementById("filtroMedico");
-
+const prescicoes_tab = document.getElementById("prescicoes_tab");
+const acessoRestrito = document.getElementById("acessoRestrito");
 const perfil = localStorage.getItem("perfil") || "comum";
+
+// Verificar permissões de acesso
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Téc. de Enfermagem";
+  // Restringir acesso ao formulário de Prescrições
+  if (!ehAdministrador || !ehMedico || !ehEnfermeiro) {
+      if (prescicoes_tab) {
+        prescicoes_tab.style.display = "none";
+      }
+      if (acessoRestrito) {
+        acessoRestrito.style.display = "block";
+      }
+  }
+
+  return true;
+}
 
 document.getElementById('usuarios-tab')?.addEventListener('shown.bs.tab', renderPrescricoes);
 
@@ -89,3 +108,4 @@ filtroPaciente?.addEventListener("input", renderPrescricoes);
 filtroMedico?.addEventListener("input", renderPrescricoes);
 
 renderPrescricoes();
+verificarPermissoes();

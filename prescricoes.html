@@ -20,66 +20,71 @@
           <i class="fas fa-arrow-left me-1"></i>Voltar ao Menu
         </a>
       </div>
-
-      <ul class="nav nav-tabs" id="mainTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="cadastro-tab" data-bs-toggle="tab" data-bs-target="#cadastro" type="button" role="tab">
-            <i class="fas fa-file-medical me-1"></i>Cadastrar Prescrição
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab">
-            <i class="fas fa-history me-1"></i>Histórico de Prescrições
-          </button>
-        </li>
-      </ul>
-
-      <div class="tab-content mt-3">
-        <div class="tab-pane fade show active" id="cadastro" role="tabpanel">
-          <form id="formPrescricao">
-            <div class="mb-3">
-              <label for="paciente" class="form-label">Paciente</label>
-              <select id="paciente" class="form-select" required></select>
-            </div>
-            <div class="mb-3">
-                    <label class="form-label">Médico</label>
-                    <select id="textoMedico" class="form-select" required>
-                    <option value="">Selecione o médico</option>
-                    </select>
-            </div>  
-            <div class="mb-3">
-              <label for="textoDiagnostico" class="form-label">Diagnóstico</label>
-              <textarea id="textoDiagnostico" class="form-control" rows="5" required></textarea>
-              <label for="textoMedicamentos" class="form-label">Medicamento(s)</label>
-              <textarea id="textoMedicamentos" class="form-control" rows="2" required></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="textoObservacoes" class="form-label">Observações</label>
-              <textarea id="textoObservacoes" class="form-control" rows="3" required></textarea>
-            </div>
-            
-            <div id="mensagemPrescricao" class="mb-2"></div>
-            <button type="submit" class="btn btn-success">
-              <i class="fas fa-save me-1"></i>Salvar
+      <div class="alert alert-info" id="acessoRestrito" style="display: none;">
+            <i class="fas fa-lock me-2"></i>
+            Acesso restrito: apenas a Equipe Médica e Administrativa pode acessar os dados de Prescrições.
+      </div>
+      <div id="prescicoes_tab">
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="cadastro-tab" data-bs-toggle="tab" data-bs-target="#cadastro" type="button" role="tab">
+              <i class="fas fa-file-medical me-1"></i>Cadastrar Prescrição
             </button>
-          </form>
-        </div>
-        <div class="tab-pane fade" id="historico" role="tabpanel">
-          <div class="row mb-3">
-            
-            <div class="row mb-3">
-            <div class="col-md-6">
-              <input type="text" id="filtroPaciente" class="form-control" placeholder="Filtrar por Paciente">
-            </div>
-            <div class="col-md-6">
-              <select id="filtroMedico" class="form-select">
-                <option value="">Todos</option>
-              </select>
-            </div>
-          </div>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab">
+              <i class="fas fa-history me-1"></i>Histórico de Prescrições
+            </button>
+          </li>
+        </ul>
 
+        <div class="tab-content mt-3">
+          <div class="tab-pane fade show active" id="cadastro" role="tabpanel">
+            <form id="formPrescricao">
+              <div class="mb-3">
+                <label for="paciente" class="form-label">Paciente</label>
+                <select id="paciente" class="form-select" required></select>
+              </div>
+              <div class="mb-3">
+                      <label class="form-label">Médico</label>
+                      <select id="textoMedico" class="form-select" required>
+                      <option value="">Selecione o médico</option>
+                      </select>
+              </div>  
+              <div class="mb-3">
+                <label for="textoDiagnostico" class="form-label">Diagnóstico</label>
+                <textarea id="textoDiagnostico" class="form-control" rows="5" required></textarea>
+                <label for="textoMedicamentos" class="form-label">Medicamento(s)</label>
+                <textarea id="textoMedicamentos" class="form-control" rows="2" required></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="textoObservacoes" class="form-label">Observações</label>
+                <textarea id="textoObservacoes" class="form-control" rows="3" required></textarea>
+              </div>
+              
+              <div id="mensagemPrescricao" class="mb-2"></div>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-1"></i>Salvar
+              </button>
+            </form>
           </div>
-          <div id="listaPrescricoes" class="list-group"></div>
+          <div class="tab-pane fade" id="historico" role="tabpanel">
+            <div class="row mb-3">
+              
+              <div class="row mb-3">
+              <div class="col-md-6">
+                <input type="text" id="filtroPaciente" class="form-control" placeholder="Filtrar por Paciente">
+              </div>
+              <div class="col-md-6">
+                <select id="filtroMedico" class="form-select">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+            </div>
+
+            </div>
+            <div id="listaPrescricoes" class="list-group"></div>
+          </div>
         </div>
       </div>
     </div>

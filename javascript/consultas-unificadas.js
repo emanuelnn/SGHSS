@@ -1,11 +1,10 @@
 // Sistema de consultas unificadas
 
-//Importação de módulos
-const Utils = require("./Utils.js");
-
 let usuarios   = JSON.parse(localStorage.getItem("usuarios")) || [];
 let consultas  = JSON.parse(localStorage.getItem("consultas")) || [];
 let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
+const agendar_tab = document.getElementById("agendar-tab");
+const pacientes_tab = document.getElementById("pacientes-tab");
 
 let especialidades = [
   "Clínico Geral", "Pediatria", "Dermatologia", "Cardiologia", "Oftalmologia",
@@ -17,10 +16,29 @@ let especialidades = [
 const perfil = localStorage.getItem("perfil") || "comum";
 const nomeUsuario = localStorage.getItem("nomeUsuario") || "";
 
+// Verificar permissões de acesso
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "Administrador";
+
+  // Restringir acesso ao formulário de cadastro
+  /*
+  if (!ehAdministrador) {
+    if (agendar_tab) {
+      agendar_tab.style.display = "none";
+    }
+    if (pacientes_tab) {
+      pacientes_tab.style.display = "none";
+    }
+  }*/
+
+  return true;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   popularSelects();
   renderPacientes();
   renderConsultas();
+  verificarPermissoes();
  
   document.getElementById("filtroPaciente")?.addEventListener("input", renderPacientes);
   document.getElementById("filtroTipo")?.addEventListener("change", renderPacientes);

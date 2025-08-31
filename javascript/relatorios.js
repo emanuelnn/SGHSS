@@ -7,12 +7,24 @@ let leitos = JSON.parse(localStorage.getItem("leitos")) || [];
 let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
 const perfil = localStorage.getItem("perfil") || "comum";
+const relatorios_tab = document.getElementById("relatorios_tab");
+const acessoRestrito = document.getElementById("acessoRestrito");
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "Administrador";
+  // Restringir acesso ao formulário de Relatórios
+  if (!ehAdministrador) {
+      if (relatorios_tab) {
+        relatorios_tab.style.display = "none";
+      }
+      if (acessoRestrito) {
+        acessoRestrito.style.display = "block";
+      }
+  }
+  return true;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-  
-  // Gerar dados financeiros fictícios se não existirem
-  gerarDadosFinanceirosFicticios();
- 
+  verificarPermissoes();
   gerarRelatorio();
   
   document.getElementById("periodo")?.addEventListener("change", gerarRelatorio);
@@ -32,7 +44,6 @@ function valorParaNumero(valorStr) {
 function gerarRelatorio() {
   const periodo = document.getElementById("periodo")?.value || "mes";
   const tipoRelatorio = document.getElementById("tipoRelatorio")?.value || "geral";
-  
   let transacoesFiltradas = filtrarTransacoes(periodo, tipoRelatorio);
   
   atualizarMetricas(transacoesFiltradas);
@@ -133,7 +144,7 @@ function atualizarGraficos(transacoesFiltradas) {
       if (!receitaPorMes[chave]) receitaPorMes[chave] = 0;
       receitaPorMes[chave] += valorParaNumero(t.valor);
     });
-   
+  
     const labels = Object.keys(receitaPorMes).sort();
     const valores = labels.map(label => receitaPorMes[label]);
 

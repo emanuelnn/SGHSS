@@ -34,23 +34,23 @@
         </li>
       </ul>
 
-      <div class="tab-content mt-3">
+      <div class="tab-content mt-3" id="formCadastro_tab">
         <!-- Cadastro -->
         <div class="tab-pane fade show active" id="cadastro" role="tabpanel">
           <div class="alert alert-info" id="acessoRestrito" style="display: none;">
             <i class="fas fa-lock me-2"></i>
             Acesso restrito: apenas administradores podem cadastrar novos usuários.
           </div>
-          
+         
           <form id="formCadastro">
             <div class="mb-3">
               <label for="tipoUsuario" class="form-label">Tipo de Usuário</label>
               <select id="tipoUsuario" class="form-select" required>
                 <option value="">Selecione...</option>
                 <option value="Administrador">Administrador</option>
-                <option value="Paciente">Paciente</option>
                 <option value="Médico">Médico</option>
-                <option value="Enfermeiro(a)">Enfermeiro(a)</option>
+                <option value="Tec. Enfermagem">Tec. Enfermagem</option>
+                <option value="Paciente">Paciente</option>
               </select>
             </div>
             <div class="mb-3">

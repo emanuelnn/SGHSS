@@ -10,6 +10,26 @@ const listaPacientes = document.getElementById("listaPacientes");
 const infoPaciente = document.getElementById("infoPaciente");
 const conteudoProntuario = document.getElementById("conteudoProntuario");
 
+const prontuarios_tab = document.getElementById("prontuarios_tab");
+const acessoRestrito = document.getElementById("acessoRestrito");
+
+// Verificar permissões de acesso
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Téc. de Enfermagem";
+  // Restringir acesso ao formulário de Prescrições
+  if (!ehAdministrador || !ehMedico || !ehEnfermeiro) {
+      if (prontuarios_tab) {
+        prontuarios_tab.style.display = "none";
+      }
+      if (acessoRestrito) {
+        acessoRestrito.style.display = "block";
+      }
+  }
+  return true;
+}
+
 // Função utilitária para formatar data
 function formatarDataBR(dataISO) {
   return dataISO ? dataISO.split("-").reverse().join("/") : "";
@@ -22,6 +42,7 @@ function formatarCPF(cpf) {
 
 // Inicialização
 document.addEventListener("DOMContentLoaded", () => {
+  verificarPermissoes();
   popularListaPacientes();
   popularFiltroCPF();
   
