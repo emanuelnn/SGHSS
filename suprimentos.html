@@ -21,6 +21,13 @@
         </a>
       </div>
 
+        <div class="alert alert-info" id="acessoRestrito" style="display: none;">
+            <i class="fas fa-lock me-2"></i>
+            Acesso restrito: apenas a equipe Hospitalar pode visualizar ou alterar o Estoque!
+          </div>
+
+
+    <div id="suprimentos_tab"></div>
       <ul class="nav nav-tabs mb-4" id="suprimentosTabs" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="estoque-tab" data-bs-toggle="tab" data-bs-target="#estoque" type="button" role="tab">
@@ -202,89 +209,91 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" id="novoProdutoModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Novo Produto</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formNovoProduto">
-            <div class="mb-3">
-              <label class="form-label">Nome do Produto</label>
-              <input type="text" class="form-control" id="nomeProduto" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Categoria</label>
-              <select class="form-select" id="categoriaProduto" required>
-                <option value="">Selecione...</option>
-                <option value="medico">Material Médico</option>
-                <option value="enfermagem">Material de Enfermagem</option>
-                <option value="laboratorio">Material de Laboratório</option>
-                <option value="administrativo">Material Administrativo</option>
-              </select>
-            </div>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Quantidade Inicial</label>
-                  <input type="number" class="form-control" id="quantidadeInicial" min="0" required>
+
+    <div class="modal fade" id="novoProdutoModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Novo Produto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="formNovoProduto">
+              <div class="mb-3">
+                <label class="form-label">Nome do Produto</label>
+                <input type="text" class="form-control" id="nomeProduto" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Categoria</label>
+                <select class="form-select" id="categoriaProduto" required>
+                  <option value="">Selecione...</option>
+                  <option value="medico">Material Médico</option>
+                  <option value="enfermagem">Material de Enfermagem</option>
+                  <option value="laboratorio">Material de Laboratório</option>
+                  <option value="administrativo">Material Administrativo</option>
+                </select>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Quantidade Inicial</label>
+                    <input type="number" class="form-control" id="quantidadeInicial" min="0" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Unidade</label>
+                    <select class="form-select" id="unidadeProduto" required>
+                      <option value="unidade">Unidade</option>
+                      <option value="caixa">Caixa</option>
+                      <option value="frasco">Frasco</option>
+                      <option value="pote">Pote</option>
+                      <option value="kit">Kit</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Unidade</label>
-                  <select class="form-select" id="unidadeProduto" required>
-                    <option value="unidade">Unidade</option>
-                    <option value="caixa">Caixa</option>
-                    <option value="frasco">Frasco</option>
-                    <option value="pote">Pote</option>
-                    <option value="kit">Kit</option>
-                  </select>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Estoque Mínimo</label>
+                    <input type="number" class="form-control" id="estoqueMinimo" min="0" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Fornecedor</label>
+                    <input type="text" class="form-control" id="fornecedorProduto" required>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Estoque Mínimo</label>
-                  <input type="number" class="form-control" id="estoqueMinimo" min="0" required>
-                </div>
+              <div class="mb-3">
+                <label class="form-label">Localização</label>
+                <input type="text" class="form-control" id="localizacaoProduto" placeholder="Ex: Armazém A - Prateleira 1" required>
               </div>
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Fornecedor</label>
-                  <input type="text" class="form-control" id="fornecedorProduto" required>
-                </div>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Localização</label>
-              <input type="text" class="form-control" id="localizacaoProduto" placeholder="Ex: Armazém A - Prateleira 1" required>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" onclick="salvarNovoProduto()">Salvar Produto</button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary" onclick="salvarNovoProduto()">Salvar Produto</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="modal fade" id="produtoModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">Detalhes do Produto</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body" id="modalBody">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-          <button type="button" class="btn btn-primary" id="btnAcaoProduto">Ação</button>
+    <div class="modal fade" id="produtoModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">Detalhes do Produto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" id="modalBody">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary" id="btnAcaoProduto">Ação</button>
+          </div>
         </div>
       </div>
     </div>

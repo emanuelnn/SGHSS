@@ -2,9 +2,10 @@ let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
 let movimentacoes = JSON.parse(localStorage.getItem("movimentacoes")) || [];
 let retiradas = JSON.parse(localStorage.getItem("retiradas")) || [];
 
-const suprimeiros_tab = document.getElementById("suprimeiros_tab");
+const suprimentos_tab = document.getElementById("suprimentos_tab");
+const suprimentosTabs = document.getElementById("suprimentosTabs");
 const acessoRestrito = document.getElementById("acessoRestrito");
-
+const estoque = document.getElementById("estoque");
 const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
 
 function verificarPermissoes() {
@@ -13,9 +14,17 @@ function verificarPermissoes() {
   const ehEnfermeiro = perfil === "téc. de enfermagem";
 
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
-      if (suprimeiros_tab) {
-        suprimeiros_tab.style.display = "none";
+      if (suprimentos_tab) {
+        suprimentos_tab.style.display = "none";
       }
+      if (suprimentosTabs) {
+        suprimentosTabs.style.display = "none";
+      }
+
+      if (estoque) {
+        estoque.style.display = "none";
+      }
+
       if (acessoRestrito) {
         acessoRestrito.style.display = "block";
       }
@@ -24,20 +33,12 @@ function verificarPermissoes() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Verificar permissões de acesso
-  const perfil = localStorage.getItem("perfil") || "comum";
-  const perfisPermitidos = ["Administrador", "Médico", "Enfermeiro(a)", "Enfermeiro"];
-  
-  if (!perfisPermitidos.includes(perfil)) {
-    alert("Acesso negado! Apenas administradores, médicos e enfermeiros podem acessar esta página.");
-    window.location.href = "dashboard.html";
-    return;
-  }
 
   atualizarEstatisticas();
   renderizarProdutos();
   popularSelectProdutos();
   renderizarHistoricoRetiradas();
+  verificarPermissoes();
  
   // Event listeners
   document.getElementById("filtroCategoria")?.addEventListener("change", filtrarProdutos);

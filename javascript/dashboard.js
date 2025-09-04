@@ -1,5 +1,29 @@
   const canvasGraficoPizza = document.getElementById('graficoPizza');
 
+  const dashboard_tab = document.getElementById('dashboard_tab');
+  const acessoRestrito = document.getElementById('acessoRestrito');
+  const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+  const cadastro_tab = document.getElementById("cadastro_tab");
+
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "administrador";
+  const ehMedico = perfil === "médico";
+  const ehEnfermeiro = perfil === "téc. de enfermagem";
+
+  if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
+
+    if (dashboard_tab) {
+      dashboard_tab.style.display = 'none';
+    }
+    if (acessoRestrito) {
+      acessoRestrito.style.display = 'block';
+    }
+    if(cadastro_tab){
+      cadastro_tab.style.background = 'red';
+    }
+  }
+}
+
   if (canvasGraficoPizza) {
 
     if (!localStorage.getItem("consultas") || JSON.parse(localStorage.getItem("consultas")).length === 0) {
@@ -12,7 +36,7 @@
     const especialidadesContagem = {};
 
     consultasParaGrafico.forEach(c => {
-      const dataConsulta = new Date(c.data); // agora pega direto do formato ISO
+      const dataConsulta = new Date(c.data);
 
       if (dataConsulta >= hojeSemTempo) {
         if (especialidadesContagem[c.especialidade]) {
@@ -77,6 +101,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       updateMetrics();
       updateRecentActivities();
+      verificarPermissoes();
     });
     
     function updateMetrics() {

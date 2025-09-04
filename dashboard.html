@@ -23,84 +23,84 @@
       </div>
       
       <ul class="nav-menu">
-        <li class="nav-item">
+        <li class="nav-item" id="inicio_tab">
           <a href="dashboard.html" class="nav-link active">
             <i class="fas fa-tachometer-alt"></i>
             <span>Dashboard</span>
           </a>
         </li>
         
-        <li class="nav-item">
+        <li class="nav-item" id="cadastro_tab">
           <a href="cadastro.html" class="nav-link">
             <i class="fas fa-user-plus"></i>
             <span>Cadastro de Usuários</span>
           </a>
         </li>
         
-        <li class="nav-item">
+        <li class="nav-item" id="consultas_tab">
           <a href="consultas-unificadas.html" class="nav-link">
             <i class="fas fa-calendar-plus"></i>
             <span>Agendar Consulta</span>
           </a>
         </li>
-        
-        <li class="nav-item">
+       
+        <li class="nav-item" id="prescricoes_tab">
           <a href="prescricoes.html" class="nav-link">
             <i class="fas fa-prescription-bottle-alt"></i>
             <span>Prescrições Médicas</span>
           </a>
         </li>
         
-        <li class="nav-item">
+        <li class="nav-item" id="prontuarios_tab">
           <a href="prontuarios.html" class="nav-link">
             <i class="fas fa-file-medical"></i>
             <span>Prontuários Eletrônicos</span>
           </a>
         </li>
         
-        <li class="nav-item">
+        <li class="nav-item" id="exames_tab">
           <a href="exames.html" class="nav-link">
             <i class="fas fa-vial"></i>
             <span>Exames e Resultados</span>
           </a>
         </li>
         
-        <li class="nav-item">
+        <li class="nav-item" id="disponibilidade_tab">
           <a href="disponibilidade.html" class="nav-link">
             <i class="fas fa-clock"></i>
             <span>Disponibilidade Profissionais</span>
           </a>
         </li>
         
-        <li class="nav-item">
+        <li class="nav-item" id="leitos_tab">
           <a href="leitos.html" class="nav-link">
             <i class="fas fa-bed"></i>
             <span>Gestão de Leitos</span>
           </a>
         </li>
         
-        <li class="nav-item">
+        <li class="nav-item" id="relatorios_tab">
           <a href="relatorios.html" class="nav-link">
             <i class="fas fa-chart-line"></i>
             <span>Relatórios Financeiros</span>
           </a>
         </li>
        
-        <li class="nav-item">
+        <li class="nav-item" id="suprimentos_tab">
           <a href="suprimentos.html" class="nav-link">
             <i class="fas fa-boxes"></i>
             <span>Suprimentos e Estoque</span>
           </a>
         </li>
         
-        <li class="nav-item">
+        <li class="nav-item" id="telemedicina_tab">
           <a href="telemedicina.html" class="nav-link">
             <i class="fas fa-video"></i>
             <span>Telemedicina</span>
           </a>
         </li>
        
-        <li class="nav-item">
+        <li class="nav-item" id="login_tab">
           <a href="index.html" id="logoutLink" class="nav-link">
             <i class="fas fa-sign-out-alt"></i>
             <span>Sair</span>
@@ -113,50 +113,58 @@
         <h1>Painel de Controle SGHSS</h1>
         <p>Bem-vindo ao Sistema de Gestão Hospitalar e de Serviços de Saúde</p>
       </div>
-      <div class="metrics-grid">
-        <div class="metric-card primary">
-          <div class="metric-icon">
-            <i class="fas fa-users"></i>
+
+      <div class="alert alert-info" id="acessoRestrito" style="display: none;">
+            <i class="fas fa-lock me-2"></i>
+            Acesso Limitado: Uso exclusivo da equipe Hospitalar.
           </div>
-          <div class="metric-value" id="totalPacientes">0</div>
-          <div class="metric-label">Pacientes Registrados</div>
-        </div>
-        
-        <div class="metric-card success">
-          <div class="metric-icon">
-            <i class="fas fa-user-md"></i>
+
+      <div id="dashboard_tab">
+        <div class="metrics-grid">
+          <div class="metric-card primary">
+            <div class="metric-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="metric-value" id="totalPacientes">0</div>
+            <div class="metric-label">Pacientes Registrados</div>
           </div>
-          <div class="metric-value" id="totalMedicos">0</div>
-          <div class="metric-label">Médicos Registrados</div>
-        </div>
-        
-        <div class="metric-card warning">
-          <div class="metric-icon">
-            <i class="fas fa-calendar-check"></i>
+          
+          <div class="metric-card success">
+            <div class="metric-icon">
+              <i class="fas fa-user-md"></i>
+            </div>
+            <div class="metric-value" id="totalMedicos">0</div>
+            <div class="metric-label">Médicos Registrados</div>
           </div>
-          <div class="metric-value" id="consultasFuturas">0</div>
-          <div class="metric-label">Consultas Futuras</div>
-        </div>
-        
-        <div class="metric-card info">
-          <div class="metric-icon">
-            <i class="fas fa-bed"></i>
+          
+          <div class="metric-card warning">
+            <div class="metric-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="metric-value" id="consultasFuturas">0</div>
+            <div class="metric-label">Consultas Futuras</div>
           </div>
-          <div class="metric-value" id="leitosOcupados">0</div>
-          <div class="metric-label">Leitos Ocupados</div>
-        </div>
-      </div>
-      <div class="charts-section">
-        <div class="chart-card">
-          <h5>Consultas Futuras por Especialidade</h5>
-          <div class="chart-container">
-            <canvas id="graficoPizza"></canvas>
+          
+          <div class="metric-card info">
+            <div class="metric-icon">
+              <i class="fas fa-bed"></i>
+            </div>
+            <div class="metric-value" id="leitosOcupados">0</div>
+            <div class="metric-label">Leitos Ocupados</div>
           </div>
         </div>
-        
-        <div class="chart-card">
-          <h5>Atividades Recentes</h5>
-          <div id="recentActivities">
+        <div class="charts-section">
+          <div class="chart-card">
+            <h5>Consultas Futuras por Especialidade</h5>
+            <div class="chart-container">
+              <canvas id="graficoPizza"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <h5>Atividades Recentes</h5>
+            <div id="recentActivities">
+            </div>
           </div>
         </div>
       </div>
