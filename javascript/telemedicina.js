@@ -1,13 +1,42 @@
-// Sistema de Telemedicina
 let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 let teleconsultas = JSON.parse(localStorage.getItem("teleconsultas")) || [];
 let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
 let consultaEmAndamento = null;
 let chatMensagens = [];
 
-const perfil = localStorage.getItem("perfil") || "comum";
+const pacientes = usuarios.filter(u => u.tipoUsuario === "Paciente");
+const medicos = usuarios.filter(u => u.tipoUsuario === "Médico");
 
-// Especialidades médicas
+const pacienteTele = document.getElementById("pacienteTele");
+const filtroPaciente = document.getElementById("filtroPaciente");
+
+const prontuarioMedico = document.getElementById("prontuarioMedico");
+const nomeUsuario = localStorage.getItem("nomeUsuario") || "";
+const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "administrador";
+  const ehMedico = perfil === "médico";
+  const ehEnfermeiro = perfil === "téc. de enfermagem";
+
+  if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
+
+    if (prontuarioMedico) {
+      prontuarioMedico.style.display = "none";
+    }
+
+    if (pacienteTele) {
+      substituirPorInput(pacienteTele, nomeUsuario);
+    }
+
+    if (filtroPaciente) {
+      substituirPorInput(filtroPaciente, nomeUsuario);
+      filtrarConsultas();
+    }
+  }
+}
+
+
 const especialidades = [
   "Clínico Geral", "Pediatria", "Dermatologia", "Cardiologia", "Oftalmologia",
   "Ginecologia e Obstetrícia", "Ortopedia e Traumatologia", "Neurologia", "Psiquiatria",
@@ -20,26 +49,19 @@ function valorMonetarioAleatorio() {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-// Inicialização
 document.addEventListener("DOMContentLoaded", () => {
   popularPacientesMedicos();
   carregarConsultas();
-  
-  // Event listeners
+  verificarPermissoes();
+
   document.getElementById("medicoTele")?.addEventListener("change", atualizarEspecialidade);
-  
-  // Data mínima = hoje
+
   const hoje = new Date().toISOString().split("T")[0];
   document.getElementById("dataTele")?.setAttribute("min", hoje);
 });
 
-// Popular pacientes e médicos
 function popularPacientesMedicos() {
-  const pacientes = usuarios.filter(u => u.tipoUsuario === "Paciente");
-  const medicos = usuarios.filter(u => u.tipoUsuario === "Médico");
-  
-  // Select de paciente
-  const pacienteTele = document.getElementById("pacienteTele");
+
   if (pacienteTele) {
     pacienteTele.innerHTML = '<option value="">Selecione o paciente</option>';
     pacientes.forEach(p => {
@@ -49,8 +71,17 @@ function popularPacientesMedicos() {
       pacienteTele.appendChild(option);
     });
   }
+
+  if (filtroPaciente) {
+    filtroPaciente.innerHTML = '<option value="">Selecione o paciente</option>';
+    pacientes.forEach(p => {
+      const option = document.createElement("option");
+      option.value = p.nome;
+      option.textContent = p.nome;
+      filtroPaciente.appendChild(option);
+    });
+  }
   
-  // Select de médico
   const medicoTele = document.getElementById("medicoTele");
   if (medicoTele) {
     medicoTele.innerHTML = '<option value="">Selecione o médico</option>';
@@ -63,13 +94,11 @@ function popularPacientesMedicos() {
   }
 }
 
-// Atualizar especialidade
 function atualizarEspecialidade() {
   const medico = document.getElementById("medicoTele").value;
   const especialidadeInput = document.getElementById("especialidadeTele");
   
   if (medico && especialidadeInput) {
-    // Simular especialidade do médico
     const especialidadeAleatoria = especialidades[Math.floor(Math.random() * especialidades.length)];
     especialidadeInput.value = especialidadeAleatoria;
   } else {
@@ -77,7 +106,6 @@ function atualizarEspecialidade() {
   }
 }
 
-// Agendar teleconsulta
 function agendarTeleconsulta() {
   const paciente = document.getElementById("pacienteTele").value;
   const medico = document.getElementById("medicoTele").value;
@@ -85,14 +113,12 @@ function agendarTeleconsulta() {
   const data = document.getElementById("dataTele").value;
   const horario = document.getElementById("horarioTele").value;
   const motivo = document.getElementById("motivoTele").value;
-  
-  // Validação
+ 
   if (!paciente || !medico || !especialidade || !data || !horario) {
     alert("Por favor, preencha todos os campos obrigatórios.");
     return;
   }
-  
-  // Verificar conflito de horário
+
   const conflito = teleconsultas.some(t => 
     t.medico === medico && 
     t.data === data && 
@@ -133,7 +159,6 @@ function agendarTeleconsulta() {
     financeiro.push(NovaCobranca);
     localStorage.setItem("financeiro", JSON.stringify(financeiro));
 
-  // Mostrar mensagem de sucesso
   const alerta = document.createElement("div");
   alerta.className = "alert alert-success alert-dismissible fade show";
   alerta.innerHTML = `
@@ -144,45 +169,60 @@ function agendarTeleconsulta() {
   `;
   
   const container = document.querySelector("#agendarTele .container");
-  container.insertBefore(alerta, container.firstChild);
-  
-  // Limpar formulário
-  document.getElementById("pacienteTele").value = "";
+
   document.getElementById("medicoTele").value = "";
   document.getElementById("especialidadeTele").value = "";
   document.getElementById("dataTele").value = "";
   document.getElementById("horarioTele").value = "";
   document.getElementById("motivoTele").value = "";
-  
-  // Remover alerta após 5 segundos
+ 
   setTimeout(() => {
     alerta.remove();
   }, 5000);
+
+  filtrarConsultas();
 }
 
-// Gerar link de acesso simulado
+
 function gerarLinkAcesso() {
   return `https://telemedicina.vidaplus.com/consulta/${Date.now().toString(36)}`;
 }
 
-// Carregar consultas
 function carregarConsultas() {
   renderizarConsultas(teleconsultas);
 }
 
-// Filtrar consultas
+function substituirPorInput(elemento, valor) {
+  if (!elemento) return;
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = elemento.className;
+  input.id = elemento.id;
+  input.name = elemento.name || elemento.id;
+  input.value = valor;
+  input.readOnly = true;
+
+  elemento.parentNode.replaceChild(input, elemento);
+}
+
 function filtrarConsultas() {
   const status = document.getElementById("filtroStatus").value;
   const periodo = document.getElementById("filtroPeriodo").value;
-  
+    const ehAdministrador = perfil === "administrador";
+  const ehMedico = perfil === "médico";
+  const ehEnfermeiro = perfil === "téc. de enfermagem";
+
   let consultasFiltradas = teleconsultas;
-  
-  // Filtrar por status
+
+  if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
+    consultasFiltradas = consultasFiltradas.filter(t => t.paciente === nomeUsuario);
+  }
+
   if (status) {
     consultasFiltradas = consultasFiltradas.filter(t => t.status === status);
   }
-  
-  // Filtrar por período
+
   if (periodo !== "todos") {
     const dias = parseInt(periodo);
     const dataLimite = new Date();
@@ -197,7 +237,6 @@ function filtrarConsultas() {
   renderizarConsultas(consultasFiltradas);
 }
 
-// Renderizar consultas
 function renderizarConsultas(consultasParaRenderizar) {
   const listaConsultas = document.getElementById("listaConsultas");
   
@@ -210,7 +249,6 @@ function renderizarConsultas(consultasParaRenderizar) {
     return;
   }
   
-  // Ordenar por data (mais recente primeiro)
   consultasParaRenderizar.sort((a, b) => new Date(b.data) - new Date(a.data));
   
   consultasParaRenderizar.forEach(consulta => {
@@ -279,29 +317,24 @@ function renderizarConsultas(consultasParaRenderizar) {
   });
 }
 
-// Iniciar consulta direta
 function iniciarConsultaDireta(idConsulta) {
   const consulta = teleconsultas.find(t => t.id === idConsulta);
   if (!consulta) return;
   
-  // Mudar para aba de consulta em andamento
   const emAndamentoTab = document.getElementById("emAndamento-tab");
   const emAndamentoTabButton = new bootstrap.Tab(emAndamentoTab);
   emAndamentoTabButton.show();
-  
-  // Simular início da consulta
-  iniciarConsulta();
+
+  iniciarConsulta(idConsulta);
 }
 
-// Iniciar consulta
-function iniciarConsulta() {
+function iniciarConsulta(idConsulta) {
   consultaEmAndamento = {
     id: Date.now(),
     inicio: new Date(),
     status: "Em Andamento"
   };
-  
-  // Atualizar interface
+
   const videoArea = document.getElementById("videoArea");
   videoArea.innerHTML = `
     <div class="text-center text-white">
@@ -315,31 +348,25 @@ function iniciarConsulta() {
     </div>
   `;
   
-  // Mostrar botões de controle
   document.getElementById("startBtn").style.display = "none";
   document.getElementById("stopBtn").style.display = "inline-flex";
   document.getElementById("muteBtn").style.display = "inline-flex";
   document.getElementById("videoBtn").style.display = "inline-flex";
   document.getElementById("shareBtn").style.display = "inline-flex";
   
-  // Habilitar chat
   document.getElementById("chatInput").disabled = false;
   document.getElementById("sendBtn").disabled = false;
   
-  // Adicionar mensagem inicial ao chat
   adicionarMensagem("sistema", "Consulta iniciada. Bem-vindo à telemedicina VidaPlus!");
   
-  // Atualizar informações da consulta
-  atualizarInfoConsulta();
+  atualizarInfoConsulta(idConsulta);
 }
 
-// Parar consulta
 function pararConsulta() {
   if (!confirm("Tem certeza que deseja encerrar a consulta?")) return;
   
   consultaEmAndamento = null;
   
-  // Atualizar interface
   const videoArea = document.getElementById("videoArea");
   videoArea.innerHTML = `
     <div class="text-center">
@@ -348,26 +375,21 @@ function pararConsulta() {
     </div>
   `;
   
-  // Esconder botões de controle
   document.getElementById("startBtn").style.display = "inline-flex";
   document.getElementById("stopBtn").style.display = "none";
   document.getElementById("muteBtn").style.display = "none";
   document.getElementById("videoBtn").style.display = "none";
   document.getElementById("shareBtn").style.display = "none";
   
-  // Desabilitar chat
   document.getElementById("chatInput").disabled = true;
   document.getElementById("sendBtn").disabled = true;
   
-  // Limpar chat
   document.getElementById("chatArea").innerHTML = '<div class="text-center text-muted"><small>Consulta encerrada</small></div>';
   
-  // Limpar prontuário
   document.getElementById("sintomas").value = "";
   document.getElementById("diagnostico").value = "";
   document.getElementById("recomendacoes").value = "";
-  
-  // Limpar informações da consulta
+ 
   document.getElementById("infoConsulta").innerHTML = `
     <div class="text-center text-muted">
       <i class="fas fa-info-circle fa-2x mb-2"></i>
@@ -376,7 +398,6 @@ function pararConsulta() {
   `;
 }
 
-// Alternar microfone
 function alternarMute() {
   const muteBtn = document.getElementById("muteBtn");
   const icon = muteBtn.querySelector("i");
@@ -396,7 +417,6 @@ function alternarMute() {
   }
 }
 
-// Alternar vídeo
 function alternarVideo() {
   const videoBtn = document.getElementById("videoBtn");
   const icon = videoBtn.querySelector("i");
@@ -416,16 +436,14 @@ function alternarVideo() {
   }
 }
 
-// Compartilhar tela
 function compartilharTela() {
   adicionarMensagem("sistema", "Solicitação de compartilhamento de tela enviada");
-  // Simular compartilhamento
+
   setTimeout(() => {
     adicionarMensagem("sistema", "Tela compartilhada com sucesso");
   }, 2000);
 }
 
-// Enviar mensagem
 function enviarMensagem() {
   const chatInput = document.getElementById("chatInput");
   const mensagem = chatInput.value.trim();
@@ -435,7 +453,6 @@ function enviarMensagem() {
   adicionarMensagem("paciente", mensagem);
   chatInput.value = "";
   
-  // Simulação de resposta
   setTimeout(() => {
     const respostas = [
       "Entendo, vou verificar isso para você.",
@@ -449,7 +466,6 @@ function enviarMensagem() {
   }, 1000 + Math.random() * 2000);
 }
 
-// Adicionar mensagem ao chat
 function adicionarMensagem(remitente, texto) {
   const chatArea = document.getElementById("chatArea");
   
@@ -472,19 +488,18 @@ function adicionarMensagem(remitente, texto) {
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
-// Atualizar informações da consulta
-function atualizarInfoConsulta() {
+function atualizarInfoConsulta(idConsulta) {
   const infoConsulta = document.getElementById("infoConsulta");
-  
+   const consulta = teleconsultas.find(t => t.id === idConsulta);
   if (!infoConsulta || !consultaEmAndamento) return;
   
   infoConsulta.innerHTML = `
     <div>
       <h6><i class="fas fa-user-md me-2"></i>Médico</h6>
-      <p>Dr(a). Maria Silva</p>
+      <p>${consulta.medico}</p>
       
       <h6><i class="fas fa-user me-2"></i>Paciente</h6>
-      <p>João da Silva</p>
+      <p>${consulta.paciente}</p>
       
       <h6><i class="fas fa-clock me-2"></i>Duração</h6>
       <p id="duracaoConsulta">00:00</p>
@@ -494,11 +509,9 @@ function atualizarInfoConsulta() {
     </div>
   `;
   
-  // Atualizar duração
   atualizarDuracaoConsulta();
 }
 
-// Atualizar duração da consulta
 function atualizarDuracaoConsulta() {
   if (!consultaEmAndamento) return;
   
@@ -516,7 +529,6 @@ function atualizarDuracaoConsulta() {
   setTimeout(atualizarDuracaoConsulta, 1000);
 }
 
-// Finalizar consulta
 function finalizarConsulta() {
   if (!confirm("Tem certeza que deseja finalizar esta consulta?")) return;
   
@@ -529,7 +541,6 @@ function finalizarConsulta() {
     return;
   }
   
-  // Salvar prontuário
   const prontuario = {
     sintomas: sintomas,
     diagnostico: diagnostico,
@@ -537,20 +548,16 @@ function finalizarConsulta() {
     data: new Date().toISOString()
   };
   
-  // Atualizar status da consulta
   consultaEmAndamento.status = "Concluída";
   consultaEmAndamento.prontuario = JSON.stringify(prontuario);
   
-  // Salvar no localStorage
   localStorage.setItem("teleconsultas", JSON.stringify(teleconsultas));
   
   alert("Consulta finalizada com sucesso! Prontuário salvo.");
   
-  // Encerrar consulta
   pararConsulta();
 }
 
-// Cancelar consulta
 function cancelarConsulta(idConsulta) {
   if (!confirm("Tem certeza que deseja cancelar esta consulta?")) return;
   
@@ -562,7 +569,6 @@ function cancelarConsulta(idConsulta) {
   }
 }
 
-// Ver prontuário
 function verProntuario(idConsulta) {
   const consulta = teleconsultas.find(t => t.id === idConsulta);
   if (!consulta || !consulta.prontuario) return;
@@ -575,7 +581,6 @@ function verProntuario(idConsulta) {
         `Recomendações: ${prontuario.recomendacoes}`);
 }
 
-// Event listener para Enter no chat
 document.addEventListener("DOMContentLoaded", () => {
   const chatInput = document.getElementById("chatInput");
   if (chatInput) {

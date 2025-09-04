@@ -5,6 +5,35 @@ let consultas  = JSON.parse(localStorage.getItem("consultas")) || [];
 let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
 const agendar_tab = document.getElementById("agendar-tab");
 const pacientes_tab = document.getElementById("pacientes-tab");
+const acessoRestrito = document.getElementById("acessoRestrito");
+const filtroPaciente = document.getElementById("filtroConsulta");
+const TabConsultas = document.getElementById("consultas-tab");
+const nomeUsuario = localStorage.getItem("nomeUsuario") || "";
+const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "administrador";
+  const ehMedico = perfil === "médico";
+  const ehEnfermeiro = perfil === "téc. de enfermagem";
+
+  if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
+    if (agendar_tab) {
+      agendar_tab.style.display = "none";
+    }
+    if (pacientes_tab) {
+      pacientes_tab.style.display = "none";
+    }
+    if (acessoRestrito) {
+      acessoRestrito.style.display = "block";
+    }
+
+    filtroPaciente.style.display = "block";
+    filtroPaciente.readOnly = true;
+    filtroPaciente.value = nomeUsuario;
+    TabConsultas.click();
+  }
+  return true;
+}
 
 let especialidades = [
   "Clínico Geral", "Pediatria", "Dermatologia", "Cardiologia", "Oftalmologia",
@@ -13,32 +42,11 @@ let especialidades = [
   "Reumatologia", "Pneumologia", "Nefrologia", "Infectologia", "Oncologia"
 ];
 
-const perfil = localStorage.getItem("perfil") || "comum";
-const nomeUsuario = localStorage.getItem("nomeUsuario") || "";
-
-// Verificar permissões de acesso
-function verificarPermissoes() {
-  const ehAdministrador = perfil === "Administrador";
-
-  // Restringir acesso ao formulário de cadastro
-  /*
-  if (!ehAdministrador) {
-    if (agendar_tab) {
-      agendar_tab.style.display = "none";
-    }
-    if (pacientes_tab) {
-      pacientes_tab.style.display = "none";
-    }
-  }*/
-
-  return true;
-}
-
 document.addEventListener("DOMContentLoaded", () => {
+  verificarPermissoes();
   popularSelects();
   renderPacientes();
   renderConsultas();
-  verificarPermissoes();
  
   document.getElementById("filtroPaciente")?.addEventListener("input", renderPacientes);
   document.getElementById("filtroTipo")?.addEventListener("change", renderPacientes);

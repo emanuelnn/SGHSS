@@ -4,7 +4,57 @@ let consultas     = JSON.parse(localStorage.getItem("consultas")) || [];
 let teleconsultas = JSON.parse(localStorage.getItem("teleconsultas")) || [];
 let financeiro    = JSON.parse(localStorage.getItem("financeiro")) || [];
 
-const perfil = localStorage.getItem("perfil") || "comum";
+const tiposExames = [
+  "Hemograma Completo", "Glicemia de Jejum", "Colesterol Total", "TSH", "T4 Livre",
+  "Urina Tipo 1", "Ultrassonografia Abdominal", "Rai-X de Tórax", "Eletrocardiograma",
+  "Tomografia Computadorizada", "Ressonância Magnética", "Endoscopia", "Colonoscopia",
+  "Mamografia", "Papanicolau", "PSA", "Hemocultura", "Ecocardiograma"
+];
+
+const nomeUsuario = localStorage.getItem("nomeUsuario") || "";
+const pacienteExame = document.getElementById("pacienteExame");
+const filtroPacienteResultado = document.getElementById("filtroPacienteResultado");
+const pacienteHistorico = document.getElementById("pacienteHistorico");
+const filtroTipoExame = document.getElementById("BtnFiltrarResultado");
+const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "administrador";
+  const ehMedico = perfil === "médico";
+  const ehEnfermeiro = perfil === "téc. de enfermagem";
+
+  if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
+
+    if (pacienteExame) {
+      substituirPorInput(pacienteExame, nomeUsuario);
+    }
+
+    if (filtroPacienteResultado) {
+      substituirPorInput(filtroPacienteResultado, nomeUsuario);
+    }
+
+    if (pacienteHistorico) {
+      substituirPorInput(pacienteHistorico, nomeUsuario);
+    }
+
+    filtrarResultados();
+
+  }
+}
+
+function substituirPorInput(elemento, valor) {
+  if (!elemento) return;
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = elemento.className;
+  input.id = elemento.id;
+  input.name = elemento.name || elemento.id;
+  input.value = valor;
+  input.readOnly = true;
+
+  elemento.parentNode.replaceChild(input, elemento);
+}
 
 function valorMonetarioAleatorio() {
   const valor = Math.floor(Math.random() * (2000 - 100 + 1)) + 50;
@@ -13,7 +63,6 @@ function valorMonetarioAleatorio() {
 
 document.addEventListener("DOMContentLoaded", () => {
   popularPacientes();
-  popularFiltros();
  
   document.getElementById("tipoExame")?.addEventListener("change", toggleOutroExame);
   document.getElementById("dataExame")?.addEventListener("change", validarDataExame);
@@ -25,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function popularPacientes() {
   const pacientes = usuarios.filter(u => u.tipoUsuario === "Paciente");
   
-  const pacienteExame = document.getElementById("pacienteExame");
   if (pacienteExame) {
     pacienteExame.innerHTML = '<option value="">Selecione o paciente</option>';
     pacientes.forEach(p => {
@@ -60,19 +108,18 @@ function popularPacientes() {
   }
 }
 
-function popularFiltros() {
-  const tiposExames = [...new Set(exames.map(e => e.tipo))];
-  const filtroTipoExame = document.getElementById("filtroTipoExame");
-  
-  if (filtroTipoExame) {
-    filtroTipoExame.innerHTML = '<option value="">Todos os tipos</option>';
-    tiposExames.forEach(tipo => {
-      const option = document.createElement("option");
-      option.value = tipo;
-      option.textContent = tipo;
-      filtroTipoExame.appendChild(option);
-    });
-  }
+function preencherTiposExame(tipoExame) {
+  const select = document.getElementById(tipoExame);
+  if (!select) return;
+
+  select.innerHTML = '<option value="">Selecione o tipo</option>';
+
+  tiposExames.forEach(tipo => {
+    const option = document.createElement("option");
+    option.value = tipo;
+    option.textContent = tipo;
+    select.appendChild(option);
+  });
 }
 
 function toggleOutroExame() {
@@ -113,7 +160,7 @@ function agendarExame() {
       alert("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
-  
+ 
     if (tipoExame === "Outro" && !outroExame) {
       alert("Por favor, especifique o tipo de exame.");
       return;
@@ -405,4 +452,7 @@ function imprimirResultado() {
 
 document.addEventListener("DOMContentLoaded", () => {
   renderizarResultados(exames);
+  verificarPermissoes();
+  preencherTiposExame("tipoExame");
+  preencherTiposExame("filtroTipoExame");
 });

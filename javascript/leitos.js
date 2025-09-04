@@ -3,19 +3,17 @@ let pacientes  = JSON.parse(localStorage.getItem("usuarios")) || [];
 let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
 
 const perfisValidos = ["Livre", "Ocupado", "Manutenção"];
-const perfil = localStorage.getItem("perfil") || "comum";
 const leitos_tab = document.getElementById("leitos_tab");
 const acessoRestrito = document.getElementById("acessoRestrito");
 
-// Verificar permissões de acesso
-// Verificar permissões de acesso
-function verificarPermissoes() {
-  const ehAdministrador = perfil === "Administrador";
-  const ehMedico = perfil === "Médico";
-  const ehEnfermeiro = perfil === "Tec. de Enfermagem";
+const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
 
-  // Restringir acesso ao formulário de Leitos
-  if (!ehAdministrador || !ehMedico || !ehEnfermeiro) {
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "administrador";
+  const ehMedico = perfil === "médico";
+  const ehEnfermeiro = perfil === "téc. de enfermagem";
+
+  if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
     if (leitos_tab) {
       leitos_tab.style.display = "none";
     }

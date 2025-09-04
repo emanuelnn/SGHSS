@@ -3,7 +3,6 @@ let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 let prontuarios = JSON.parse(localStorage.getItem("prontuarios")) || [];
 let pacienteSelecionado = null;
 
-const perfil = localStorage.getItem("perfil") || "comum";
 const filtroPacienteInput = document.getElementById("filtroPaciente");
 const filtroCPFSelect = document.getElementById("filtroCPF");
 const listaPacientes = document.getElementById("listaPacientes");
@@ -13,13 +12,14 @@ const conteudoProntuario = document.getElementById("conteudoProntuario");
 const prontuarios_tab = document.getElementById("prontuarios_tab");
 const acessoRestrito = document.getElementById("acessoRestrito");
 
-// Verificar permissões de acesso
+const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "Administrador";
-  const ehMedico = perfil === "Médico";
-  const ehEnfermeiro = perfil === "Téc. de Enfermagem";
-  // Restringir acesso ao formulário de Prescrições
-  if (!ehAdministrador || !ehMedico || !ehEnfermeiro) {
+  const ehAdministrador = perfil === "administrador";
+  const ehMedico = perfil === "médico";
+  const ehEnfermeiro = perfil === "téc. de enfermagem";
+
+  if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
       if (prontuarios_tab) {
         prontuarios_tab.style.display = "none";
       }

@@ -6,11 +6,12 @@ let teleconsultas = JSON.parse(localStorage.getItem("teleconsultas")) || [];
 let leitos = JSON.parse(localStorage.getItem("leitos")) || [];
 let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
-const perfil = localStorage.getItem("perfil") || "comum";
 const relatorios_tab = document.getElementById("relatorios_tab");
 const acessoRestrito = document.getElementById("acessoRestrito");
+
+const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "Administrador";
+  const ehAdministrador = perfil === "administrador";
   // Restringir acesso ao formulário de Relatórios
   if (!ehAdministrador) {
       if (relatorios_tab) {

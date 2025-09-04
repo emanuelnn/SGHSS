@@ -2,7 +2,26 @@ let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
 let movimentacoes = JSON.parse(localStorage.getItem("movimentacoes")) || [];
 let retiradas = JSON.parse(localStorage.getItem("retiradas")) || [];
 
-const perfil = localStorage.getItem("perfil") || "comum";
+const suprimeiros_tab = document.getElementById("suprimeiros_tab");
+const acessoRestrito = document.getElementById("acessoRestrito");
+
+const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "administrador";
+  const ehMedico = perfil === "médico";
+  const ehEnfermeiro = perfil === "téc. de enfermagem";
+
+  if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
+      if (suprimeiros_tab) {
+        suprimeiros_tab.style.display = "none";
+      }
+      if (acessoRestrito) {
+        acessoRestrito.style.display = "block";
+      }
+  }
+  return true;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   // Verificar permissões de acesso

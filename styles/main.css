@@ -642,3 +642,19 @@ i {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Acesso restrito */
+#acessoRestrito {
+  background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+#acessoRestrito i {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}

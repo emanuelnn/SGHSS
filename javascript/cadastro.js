@@ -1,22 +1,21 @@
-const perfil = localStorage.getItem("perfil") || "comum";
+
 const formCadastro = document.getElementById("formCadastro");
 const acessoRestrito = document.getElementById("acessoRestrito");
 const btnSalvar = document.getElementById("btnSalvar");
 
-// Verificar permissões de acesso
-function verificarPermissoes() {
-  const ehAdministrador = perfil === "Administrador";
+const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
 
-  // Restringir acesso ao formulário de Cadastro
-  if (!ehAdministrador) {
+function verificarPermissoes() {
+  const ehAdministrador = perfil === "administrador";
+  const ehMedico = perfil === "médico";
+  const ehEnfermeiro = perfil === "téc. de enfermagem";
+
+  if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
     if (formCadastro) {
       formCadastro.style.display = "none";
     }
     if (acessoRestrito) {
       acessoRestrito.style.display = "block";
-    }
-    if (btnSalvar) {
-      btnSalvar.style.display = "none";
     }
   }
 

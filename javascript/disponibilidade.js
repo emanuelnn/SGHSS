@@ -9,16 +9,16 @@ let profissionalSelecionado = null;
 let dataSelecionada = null;
 let mesAtual = new Date();
 let anoAtual = new Date();
-const perfil = localStorage.getItem("perfil") || "comum";
 const acessoRestrito = document.getElementById("acessoRestrito");
 const disponibilidade_tab = document.getElementById("disponibilidade_tab");
+const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
 
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "Administrador";
-  const ehMedico = perfil === "Médico";
-  const ehEnfermeiro = perfil === "Téc. de Enfermagem";
-  // Restringir acesso ao formulário de Disponibilidade
-  if (!ehAdministrador || !ehMedico || !ehEnfermeiro) {
+  const ehAdministrador = perfil === "administrador";
+  const ehMedico = perfil === "médico";
+  const ehEnfermeiro = perfil === "téc. de enfermagem";
+
+  if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
       if (disponibilidade_tab) {
         disponibilidade_tab.style.display = "none";
       }
@@ -35,24 +35,14 @@ document.addEventListener('DOMContentLoaded', function() {
   carregarProfissionais();
   renderizarCalendario();
   carregarQualificacoes();
- 
-  // Verificar permissões
-  const perfil = localStorage.getItem("perfil") || "comum";
-  if (perfil === "Paciente") {
-    alert("Acesso negado! Apenas administradores, médicos e enfermeiros podem acessar esta página.");
-    window.location.href = "dashboard.html";
-  }
 });
 
-// Carregar profissionais
 function carregarProfissionais() {
   const select = document.getElementById('profissionalSelect');
   const listaProfissionais = document.getElementById('listaProfissionais');
   
-  // Filtrar apenas médicos e enfermeiros
   const profissionais = usuarios.filter(u => u.tipoUsuario === "Médico" || u.tipoUsuario === "Enfermeiro");
   
-  // Popular select
   select.innerHTML = '<option value="">Selecione o profissional</option>';
   profissionais.forEach(profissional => {
     const option = document.createElement('option');
@@ -61,7 +51,6 @@ function carregarProfissionais() {
     select.appendChild(option);
   });
   
-  // Popular lista
   listaProfissionais.innerHTML = '';
   profissionais.forEach(profissional => {
     const li = document.createElement('li');
@@ -81,7 +70,6 @@ function carregarProfissionais() {
   });
 }
 
-// Filtrar profissionais
 function filtrarProfissionais() {
   const filtro = document.getElementById('filtroProfissional').value.toLowerCase();
   const profissionais = usuarios.filter(u => u.tipoUsuario === "Médico" || u.tipoUsuario === "Enfermeiro");
@@ -106,40 +94,31 @@ function filtrarProfissionais() {
   });
 }
 
-// Selecionar profissional
 function selecionarProfissional(profissional) {
   profissionalSelecionado = profissional;
   
-  // Atualizar select
   document.getElementById('profissionalSelect').value = profissional.nome;
   
-  // Atualizar lista
   document.querySelectorAll('#listaProfissionais .list-group-item').forEach(item => {
     item.classList.remove('active');
   });
   event.currentTarget.classList.add('active');
   
-  // Carregar qualificações
   carregarQualificacoesProfissional(profissional);
   
-  // Carregar disponibilidade
   carregarDisponibilidade();
 }
 
-// Renderizar calendário
 function renderizarCalendario() {
   const calendarGrid = document.getElementById('calendarGrid');
   const currentMonth = document.getElementById('currentMonth');
   
-  // Atualizar título do mês
   const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", 
                  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
   currentMonth.textContent = `${meses[mesAtual.getMonth()]} ${anoAtual.getFullYear()}`;
   
-  // Limpar calendário
   calendarGrid.innerHTML = '';
   
-  // Adicionar headers dos dias
   const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
   diasSemana.forEach(dia => {
     const header = document.createElement('div');
@@ -148,13 +127,11 @@ function renderizarCalendario() {
     calendarGrid.appendChild(header);
   });
   
-  // Obter primeiro dia do mês
   const primeiroDia = new Date(anoAtual.getFullYear(), mesAtual.getMonth(), 1);
   const ultimoDia = new Date(anoAtual.getFullYear(), mesAtual.getMonth() + 1, 0);
   const diasNoMes = ultimoDia.getDate();
   const diaInicio = primeiroDia.getDay();
-  
-  // Adicionar dias do mês anterior
+
   const mesAnterior = new Date(anoAtual.getFullYear(), mesAtual.getMonth() - 1, 0);
   for (let i = diaInicio - 1; i >= 0; i--) {
     const dia = document.createElement('div');
@@ -163,13 +140,11 @@ function renderizarCalendario() {
     calendarGrid.appendChild(dia);
   }
   
-  // Adicionar dias do mês atual
   for (let dia = 1; dia <= diasNoMes; dia++) {
     const diaElement = document.createElement('div');
     diaElement.className = 'calendar-day';
     diaElement.textContent = dia;
     
-    // Verificar se é hoje
     const hoje = new Date();
     if (anoAtual.getFullYear() === hoje.getFullYear() && 
         mesAtual.getMonth() === hoje.getMonth() && 
@@ -177,7 +152,6 @@ function renderizarCalendario() {
       diaElement.classList.add('today');
     }
     
-    // Verificar se tem disponibilidade
     const dataAtual = new Date(anoAtual.getFullYear(), mesAtual.getMonth(), dia);
     const dataStr = dataAtual.toISOString().split('T')[0];
     const temDisponibilidade = disponibilidade.some(d => 
@@ -188,13 +162,11 @@ function renderizarCalendario() {
       diaElement.classList.add('has-disponibility');
     }
     
-    // Adicionar evento de clique
     diaElement.onclick = () => selecionarData(dataStr);
     
     calendarGrid.appendChild(diaElement);
   }
   
-  // Adicionar dias do próximo mês
   const proximoMes = new Date(anoAtual.getFullYear(), mesAtual.getMonth() + 1, 1);
   const diasRestantes = 42 - (diaInicio + diasNoMes);
   for (let dia = 1; dia <= diasRestantes; dia++) {
@@ -205,7 +177,6 @@ function renderizarCalendario() {
   }
 }
 
-// Navegar entre meses
 function previousMonth() {
   mesAtual.setMonth(mesAtual.getMonth() - 1);
   if (mesAtual.getMonth() === 11) {
@@ -224,29 +195,24 @@ function nextMonth() {
   renderizarCalendario();
 }
 
-// Selecionar data
 function selecionarData(data) {
   dataSelecionada = data;
   document.getElementById('dataSelecionada').value = formatarDataBR(data);
   
-  // Atualizar visualização dos dias
   document.querySelectorAll('.calendar-day').forEach(dia => {
     dia.classList.remove('selected');
   });
   event.currentTarget.classList.add('selected');
   
-  // Carregar horários disponíveis
   carregarHorariosDisponiveis();
 }
 
-// Carregar horários disponíveis
 function carregarHorariosDisponiveis() {
   const timeSlots = document.getElementById('timeSlots');
   timeSlots.innerHTML = '';
   
   if (!profissionalSelecionado || !dataSelecionada) return;
   
-  // Horários padrão
   const horarios = [
     { inicio: "08:00", fim: "12:00", periodo: "Manhã" },
     { inicio: "14:00", fim: "18:00", periodo: "Tarde" }
@@ -256,7 +222,6 @@ function carregarHorariosDisponiveis() {
     const slot = document.createElement('div');
     slot.className = 'time-slot';
     
-    // Verificar se já existe disponibilidade para este horário
     const existeDisponibilidade = disponibilidade.some(d => 
       d.medico === profissionalSelecionado.nome && 
       d.data === dataSelecionada &&
@@ -277,7 +242,6 @@ function carregarHorariosDisponiveis() {
   });
 }
 
-// Alternar horário
 function toggleHorario(periodo) {
   if (!profissionalSelecionado || !dataSelecionada) return;
   
@@ -288,10 +252,8 @@ function toggleHorario(periodo) {
   );
   
   if (index >= 0) {
-    // Remover disponibilidade
     disponibilidade.splice(index, 1);
   } else {
-    // Adicionar disponibilidade
     disponibilidade.push({
       id: Date.now(),
       medico: profissionalSelecionado.nome,
@@ -310,7 +272,6 @@ function toggleHorario(periodo) {
   renderizarCalendario();
 }
 
-// Salvar disponibilidade
 function salvarDisponibilidade() {
   if (!profissionalSelecionado || !dataSelecionada) {
     alert("Selecione um profissional e uma data!");
@@ -319,7 +280,6 @@ function salvarDisponibilidade() {
   
   localStorage.setItem("disponibilidade", JSON.stringify(disponibilidade));
   
-  // Mostrar sucesso
   const alerta = document.createElement('div');
   alerta.className = 'alert alert-success';
   alerta.innerHTML = `
@@ -335,7 +295,6 @@ function salvarDisponibilidade() {
   }, 3000);
 }
 
-// Limpar disponibilidade
 function limparDisponibilidade() {
   if (!profissionalSelecionado || !dataSelecionada) {
     alert("Selecione um profissional e uma data!");
@@ -343,7 +302,6 @@ function limparDisponibilidade() {
   }
   
   if (confirm("Deseja remover toda a disponibilidade deste dia?")) {
-    // Remover disponibilidade para este dia
     disponibilidade = disponibilidade.filter(d => 
       !(d.medico === profissionalSelecionado.nome && d.data === dataSelecionada)
     );
@@ -354,9 +312,7 @@ function limparDisponibilidade() {
   }
 }
 
-// Carregar qualificações
 function carregarQualificacoes() {
-  // Inicializar qualificações se não existirem
   if (qualificacoes.length === 0) {
     usuarios.filter(u => u.tipoUsuario === "Médico" || u.tipoUsuario === "Enfermeiro").forEach(profissional => {
       qualificacoes.push({
@@ -374,7 +330,6 @@ function carregarQualificacoes() {
   }
 }
 
-// Carregar qualificações do profissional
 function carregarQualificacoesProfissional(profissional) {
   const qualificacao = qualificacoes.find(q => q.profissional === profissional.nome);
   
@@ -382,12 +337,10 @@ function carregarQualificacoesProfissional(profissional) {
     document.getElementById('infoProfissional').style.display = 'none';
     document.getElementById('formQualificacoes').style.display = 'block';
     
-    // Preencher formulário
     document.getElementById('formacao').value = qualificacao.formacao || "";
     document.getElementById('experiencia').value = qualificacao.experiencia || "";
     document.getElementById('observacoesQualificacoes').value = qualificacao.observacoes || "";
     
-    // Preencher especialidades
     const listaEspecialidades = document.getElementById('listaEspecialidades');
     listaEspecialidades.innerHTML = '';
     qualificacao.especialidades.forEach(especialidade => {
@@ -395,7 +348,6 @@ function carregarQualificacoesProfissional(profissional) {
       listaEspecialidades.appendChild(tag);
     });
     
-    // Preencher certificações
     const listaCertificacoes = document.getElementById('listaCertificacoes');
     listaCertificacoes.innerHTML = '';
     qualificacao.certificacoes.forEach(certificacao => {
@@ -408,7 +360,6 @@ function carregarQualificacoesProfissional(profissional) {
   }
 }
 
-// Criar tag de especialidade
 function criarTagEspecialidade(especialidade) {
   const tag = document.createElement('div');
   tag.className = 'especialidade-tag';
@@ -421,7 +372,6 @@ function criarTagEspecialidade(especialidade) {
   return tag;
 }
 
-// Criar tag de certificação
 function criarTagCertificacao(certificacao) {
   const tag = document.createElement('div');
   tag.className = 'certificacao-tag';
@@ -434,7 +384,6 @@ function criarTagCertificacao(certificacao) {
   return tag;
 }
 
-// Adicionar especialidade
 function adicionarEspecialidade() {
   const input = document.getElementById('novaEspecialidade');
   const especialidade = input.value.trim();
@@ -454,7 +403,6 @@ function adicionarEspecialidade() {
   }
 }
 
-// Remover especialidade
 function removerEspecialidade(especialidade) {
   const qualificacao = qualificacoes.find(q => q.profissional === profissionalSelecionado.nome);
   if (qualificacao) {
@@ -464,7 +412,6 @@ function removerEspecialidade(especialidade) {
   }
 }
 
-// Adicionar certificação
 function adicionarCertificacao() {
   const input = document.getElementById('novaCertificacao');
   const certificacao = input.value.trim();
@@ -484,7 +431,6 @@ function adicionarCertificacao() {
   }
 }
 
-// Remover certificação
 function removerCertificacao(certificacao) {
   const qualificacao = qualificacoes.find(q => q.profissional === profissionalSelecionado.nome);
   if (qualificacao) {
@@ -494,7 +440,6 @@ function removerCertificacao(certificacao) {
   }
 }
 
-// Salvar qualificações
 function salvarQualificacoes() {
   if (!profissionalSelecionado) {
     alert("Selecione um profissional!");
@@ -510,7 +455,6 @@ function salvarQualificacoes() {
     
     localStorage.setItem("qualificacoes", JSON.stringify(qualificacoes));
     
-    // Mostrar sucesso
     const alerta = document.createElement('div');
     alerta.className = 'alert alert-success';
     alerta.innerHTML = `
@@ -527,36 +471,11 @@ function salvarQualificacoes() {
   }
 }
 
-// Cancelar edição
 function cancelarEdicao() {
   document.getElementById('infoProfissional').style.display = 'block';
   document.getElementById('formQualificacoes').style.display = 'none';
 }
 
-// Formatar data brasileira
 function formatarDataBR(dataISO) {
   return dataISO.split('-').reverse().join('/');
 }
-
-// Exportar funções globais
-window.disponibilidade = {
-  carregarProfissionais,
-  filtrarProfissionais,
-  selecionarProfissional,
-  renderizarCalendario,
-  previousMonth,
-  nextMonth,
-  selecionarData,
-  carregarHorariosDisponiveis,
-  toggleHorario,
-  salvarDisponibilidade,
-  limparDisponibilidade,
-  carregarQualificacoes,
-  carregarQualificacoesProfissional,
-  adicionarEspecialidade,
-  removerEspecialidade,
-  adicionarCertificacao,
-  removerCertificacao,
-  salvarQualificacoes,
-  cancelarEdicao
-};
