@@ -12,12 +12,12 @@ const conteudoProntuario = document.getElementById("conteudoProntuario");
 const prontuarios_tab = document.getElementById("prontuarios_tab");
 const acessoRestrito = document.getElementById("acessoRestrito");
 
-const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+const perfil = (localStorage.getItem("perfil") || "comum");
 
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "administrador";
-  const ehMedico = perfil === "médico";
-  const ehEnfermeiro = perfil === "téc. de enfermagem";
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Tec. Enfermagem";
 
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
       if (prontuarios_tab) {

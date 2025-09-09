@@ -1,7 +1,3 @@
-// JavaScript para página de Disponibilidade Médica - SGHSS
-// Autor: Sistema de Gestão Hospitalar e de Serviços de Saúde
-// Data: 2024
-
 let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 let disponibilidade = JSON.parse(localStorage.getItem("disponibilidade")) || [];
 let qualificacoes = JSON.parse(localStorage.getItem("qualificacoes")) || [];
@@ -11,12 +7,12 @@ let mesAtual = new Date();
 let anoAtual = new Date();
 const acessoRestrito = document.getElementById("acessoRestrito");
 const disponibilidade_tab = document.getElementById("disponibilidade_tab");
-const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+const perfil = (localStorage.getItem("perfil") || "comum");
 
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "administrador";
-  const ehMedico = perfil === "médico";
-  const ehEnfermeiro = perfil === "téc. de enfermagem";
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Tec. Enfermagem";
 
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
       if (disponibilidade_tab) {
@@ -107,6 +103,23 @@ function selecionarProfissional(profissional) {
   carregarQualificacoesProfissional(profissional);
   
   carregarDisponibilidade();
+}
+
+function carregarDisponibilidade() {
+  const profissionalSelect = document.getElementById('profissionalSelect');
+  const profissional = profissionalSelect.value;
+  
+  if (!profissional) {
+    document.getElementById('dataSelecionada').value = '';
+    document.getElementById('timeSlots').innerHTML = '';
+    return;
+  }
+  
+  profissionalSelecionado = usuarios.find(u => u.nome === profissional);
+  
+  if (dataSelecionada) {
+    carregarHorariosDisponiveis();
+  }
 }
 
 function renderizarCalendario() {

@@ -6,12 +6,12 @@ const suprimentos_tab = document.getElementById("suprimentos_tab");
 const suprimentosTabs = document.getElementById("suprimentosTabs");
 const acessoRestrito = document.getElementById("acessoRestrito");
 const estoque = document.getElementById("estoque");
-const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+const perfil = (localStorage.getItem("perfil") || "comum");
 
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "administrador";
-  const ehMedico = perfil === "médico";
-  const ehEnfermeiro = perfil === "téc. de enfermagem";
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Tec. Enfermagem";
 
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
       if (suprimentos_tab) {

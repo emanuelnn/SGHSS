@@ -9,12 +9,12 @@ const acessoRestrito = document.getElementById("acessoRestrito");
 const filtroPaciente = document.getElementById("filtroConsulta");
 const TabConsultas = document.getElementById("consultas-tab");
 const nomeUsuario = localStorage.getItem("nomeUsuario") || "";
-const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+const perfil = (localStorage.getItem("perfil") || "comum");
 
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "administrador";
-  const ehMedico = perfil === "médico";
-  const ehEnfermeiro = perfil === "téc. de enfermagem";
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Tec. Enfermagem";
 
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
     if (agendar_tab) {

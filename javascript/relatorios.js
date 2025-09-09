@@ -9,10 +9,10 @@ let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
 const relatorios_tab = document.getElementById("relatorios_tab");
 const acessoRestrito = document.getElementById("acessoRestrito");
 
-const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+const perfil = (localStorage.getItem("perfil") || "comum");
+
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "administrador";
-  // Restringir acesso ao formulário de Relatórios
+  const ehAdministrador = perfil === "Administrador";
   if (!ehAdministrador) {
       if (relatorios_tab) {
         relatorios_tab.style.display = "none";
@@ -27,7 +27,7 @@ function verificarPermissoes() {
 document.addEventListener("DOMContentLoaded", () => {
   verificarPermissoes();
   gerarRelatorio();
-  
+ 
   document.getElementById("periodo")?.addEventListener("change", gerarRelatorio);
   document.getElementById("tipoRelatorio")?.addEventListener("change", gerarRelatorio);
 });
@@ -115,7 +115,7 @@ function limparFiltros() {
 
 function atualizarMetricas(transacoesFiltradas) {
 
-  const receitaTotal = transacoesFiltradas.reduce((sum, t) => sum +valorParaNumero(t.valor), 0);
+  const receitaTotal = transacoesFiltradas.reduce((sum, t) => sum + valorParaNumero(t.valor), 0);
 
   const receitaMes = transacoesFiltradas
     .filter(t => {
@@ -283,7 +283,7 @@ function atualizarTabela(transacoesFiltradas) {
         <span class="badge bg-primary">${transacao.tipo}</span>
       </td>
       <td>
-        <strong class="text-success">R$ ${transacao.valor}</strong>
+        <strong class="text-success">${valorParaNumero(transacao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
       </td>
       <td>
         ${statusBadge}
@@ -320,7 +320,7 @@ function verDetalheTransacao(id) {
         `ID: ${transacao.id}\n` +
         `Paciente: ${transacao.paciente}\n` +
         `Serviço: ${transacao.tipo}\n` +
-        `Valor: R$ ${transacao.valor}\n` +
+        `Valor: ${valorParaNumero(transacao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\n` +
         `Data: ${formatarData(transacao.data)}\n`);
 }
 
@@ -329,7 +329,7 @@ function exportarTransacao(id) {
   if (!transacao) return;
   
   const csv = `Data;Paciente;Serviço;Valor\n` +
-              `${formatarData(transacao.data)};${transacao.paciente};${transacao.tipo};R$ ${transacao.valor}`;
+              `${formatarData(transacao.data)};${transacao.paciente};${transacao.tipo};${valorParaNumero(transacao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`;
   
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement("a");
@@ -360,7 +360,7 @@ function exportarCSV() {
   let csv = "Data;Paciente;Serviço;Valor;Status\n";
  
   transacoesFiltradas.forEach(t => {
-    csv += `${formatarData(t.data)};${t.paciente};${t.tipo};R$ ${t.valor};let status = '';
+    let status = '';
     const dataTransacao = new Date(t.data);
     const hoje = new Date();
     const diferencaDias = Math.ceil((hoje - dataTransacao) / (1000 * 60 * 60 * 24));
@@ -373,7 +373,9 @@ function exportarCSV() {
       status = 'Última semana';
     } else {
       status = 'Antiga';
-    }\n`;
+    }
+    
+    csv += `${formatarData(t.data)};${t.paciente};${t.tipo};R$ ${t.valor};${status}\n`;
   });
  
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

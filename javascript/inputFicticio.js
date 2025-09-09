@@ -96,10 +96,8 @@ function gerarDataFutura() {
 function gerarDataAleatoriaAnoAtual() {
   const anoAtual = new Date().getFullYear();
 
-  // Gera mês de 0 a 11 (Janeiro a Dezembro)
   const mes = Math.floor(Math.random() * 12);
 
-  // Define o dia de acordo com o mês (máximo de dias no mês)
   const ultimoDiaMes = new Date(anoAtual, mes + 1, 0).getDate();
   const dia = Math.floor(Math.random() * ultimoDiaMes) + 1;
 
@@ -180,7 +178,7 @@ function gerarUsuarios() {
     });
   });
   
-  //administradores
+  //Usuários pré-Definidos para testes e validações
   usuarios.push(
     {
       id: Date.now() + nomesPacientes.length + nomesMedicos.length + nomesEnfermeiros.length + 1,
@@ -196,10 +194,10 @@ function gerarUsuarios() {
     },
     {
       id: Date.now() + nomesPacientes.length + nomesMedicos.length + nomesEnfermeiros.length + 2,
-      nome: "Coordenadora de Enfermagem",
+      nome: "Coordenador de Enfermagem",
       cpf: "11111111111",
       nascimento: "1985-03-15",
-      email: "coordenadora@hospital.com",
+      email: "coordenador@hospital.com",
       telefone: "(11) 99999-1111",
       senha: "enfermeiro123",
       tipoUsuario: "Tec. Enfermagem",
@@ -210,12 +208,25 @@ function gerarUsuarios() {
     {
       id: Date.now() + nomesPacientes.length + nomesMedicos.length + nomesEnfermeiros.length + 2,
       nome: "Paciente Teste",
-      cpf: "222222222222",
+      cpf: "22222222222",
       nascimento: "1985-03-15",
       email: "N/A",
       telefone: "(11) 99999-2222",
       senha: "paciente123",
       tipoUsuario: "Paciente",
+      coren: "N/A",
+      ativo: true,
+      dataCadastro: new Date().toISOString()
+    },
+    {
+      id: Date.now() + nomesPacientes.length + nomesMedicos.length + nomesEnfermeiros.length + 2,
+      nome: "Médico Teste",
+      cpf: "33333333333",
+      nascimento: "1981-08-02",
+      email: "N/A",
+      telefone: "(11) 99999-3333",
+      senha: "medico123",
+      tipoUsuario: "Médico",
       coren: "N/A",
       ativo: true,
       dataCadastro: new Date().toISOString()
@@ -225,17 +236,19 @@ function gerarUsuarios() {
   return usuarios;
 }
 
-// Gerar dados financeiros
 function gerarFinanceiro() {
   const financeiro = [];
   const hoje = new Date();
+  const inicio = new Date("2025-01-01");
   
-  nomesPacientes.forEach((paciente, index) => {
+  nomesPacientes.forEach((paciente) => {
     const numConsultas = Math.floor(Math.random() * 3) + 1;
     
     for (let i = 0; i < numConsultas; i++) {
-      const data = new Date(hoje);
-      data.setDate(hoje.getDate() + Math.floor(Math.random() * 60) + 1);
+      const diff = hoje.getTime() - inicio.getTime();
+      
+      const randomTime = inicio.getTime() + Math.random() * diff;
+      const data = new Date(randomTime);
       
       financeiro.push({
         id: financeiro.length + 1,
@@ -250,8 +263,6 @@ function gerarFinanceiro() {
   return financeiro;
 }
 
-
-// Gerar consultas agendadas
 function gerarConsultas() {
   const consultas = [];
   const hoje = new Date();

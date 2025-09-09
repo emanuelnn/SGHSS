@@ -16,12 +16,12 @@ const pacienteExame = document.getElementById("pacienteExame");
 const filtroPacienteResultado = document.getElementById("filtroPacienteResultado");
 const pacienteHistorico = document.getElementById("pacienteHistorico");
 const filtroTipoExame = document.getElementById("BtnFiltrarResultado");
-const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+const perfil = (localStorage.getItem("perfil") || "comum");
 
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "administrador";
-  const ehMedico = perfil === "médico";
-  const ehEnfermeiro = perfil === "téc. de enfermagem";
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Tec. Enfermagem";
 
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
 

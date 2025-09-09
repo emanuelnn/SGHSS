@@ -5,13 +5,12 @@ let financeiro = JSON.parse(localStorage.getItem("financeiro")) || [];
 const perfisValidos = ["Livre", "Ocupado", "Manutenção"];
 const leitos_tab = document.getElementById("leitos_tab");
 const acessoRestrito = document.getElementById("acessoRestrito");
-
-const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+const perfil = (localStorage.getItem("perfil") || "comum");
 
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "administrador";
-  const ehMedico = perfil === "médico";
-  const ehEnfermeiro = perfil === "téc. de enfermagem";
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Tec. Enfermagem";
 
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
     if (leitos_tab) {

@@ -2,13 +2,13 @@
 const formCadastro = document.getElementById("formCadastro");
 const acessoRestrito = document.getElementById("acessoRestrito");
 const btnSalvar = document.getElementById("btnSalvar");
-
-const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+const perfil = (localStorage.getItem("perfil") || "comum");
+const ehAdministrador = perfil === "Administrador";
+const ehMedico = perfil === "Médico";
+const ehEnfermeiro = perfil === "Tec. Enfermagem";
+const tipoUsuario = document.getElementById("tipoUsuario");
 
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "administrador";
-  const ehMedico = perfil === "médico";
-  const ehEnfermeiro = perfil === "téc. de enfermagem";
 
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
     if (formCadastro) {
@@ -18,6 +18,19 @@ function verificarPermissoes() {
       acessoRestrito.style.display = "block";
     }
   }
+
+   if (ehAdministrador) {
+     tipoUsuario.innerHTML = `<option value="">Selecione...</option>
+          <option value="Administrador">Administrador</option>
+          <option value="Médico">Médico</option>
+          <option value="Tec. Enfermagem">Tec. Enfermagem</option>
+          <option value="Paciente">Paciente</option>`;
+   } else if (ehEnfermeiro) {
+     tipoUsuario.innerHTML = `<option value="">Selecione...</option>
+                              <option value="Médico">Médico</option>
+                              <option value="Tec. Enfermagem">Tec. Enfermagem</option>
+                              <option value="Paciente">Paciente</option>`;
+   }
 
   return true;
 }
@@ -47,7 +60,6 @@ function renderUsuarios() {
   }
 
   filtrados.forEach((u, i) => {
-    const ehAdministrador = perfil === "Administrador";
     const li = document.createElement("li");
     
     li.className = "list-group-item d-flex justify-content-between align-items-center";

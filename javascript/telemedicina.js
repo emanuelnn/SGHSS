@@ -12,13 +12,13 @@ const filtroPaciente = document.getElementById("filtroPaciente");
 
 const prontuarioMedico = document.getElementById("prontuarioMedico");
 const nomeUsuario = localStorage.getItem("nomeUsuario") || "";
-const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+const perfil = (localStorage.getItem("perfil") || "comum");
+
+const ehAdministrador = perfil === "Administrador";
+const ehMedico = perfil === "Médico";
+const ehEnfermeiro = perfil === "Tec. Enfermagem";
 
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "administrador";
-  const ehMedico = perfil === "médico";
-  const ehEnfermeiro = perfil === "téc. de enfermagem";
-
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
 
     if (prontuarioMedico) {
@@ -209,9 +209,6 @@ function substituirPorInput(elemento, valor) {
 function filtrarConsultas() {
   const status = document.getElementById("filtroStatus").value;
   const periodo = document.getElementById("filtroPeriodo").value;
-    const ehAdministrador = perfil === "administrador";
-  const ehMedico = perfil === "médico";
-  const ehEnfermeiro = perfil === "téc. de enfermagem";
 
   let consultasFiltradas = teleconsultas;
 

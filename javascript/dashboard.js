@@ -2,14 +2,14 @@
 
   const dashboard_tab = document.getElementById('dashboard_tab');
   const acessoRestrito = document.getElementById('acessoRestrito');
-  const perfil = (localStorage.getItem("perfil") || "comum").toLowerCase();
+  const perfil = (localStorage.getItem("perfil") || "comum");
   const cadastro_tab = document.getElementById("cadastro_tab");
 
 function verificarPermissoes() {
-  const ehAdministrador = perfil === "administrador";
-  const ehMedico = perfil === "médico";
-  const ehEnfermeiro = perfil === "téc. de enfermagem";
-
+  const ehAdministrador = perfil === "Administrador";
+  const ehMedico = perfil === "Médico";
+  const ehEnfermeiro = perfil === "Tec. Enfermagem";
+console.log(ehEnfermeiro);
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
 
     if (dashboard_tab) {
