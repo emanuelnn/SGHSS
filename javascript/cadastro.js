@@ -7,6 +7,7 @@ const ehAdministrador = perfil === "Administrador";
 const ehMedico = perfil === "Médico";
 const ehEnfermeiro = perfil === "Tec. Enfermagem";
 const tipoUsuario = document.getElementById("tipoUsuario");
+const usuarioTab = document.getElementById("usuarios-tab");
 
 function verificarPermissoes() {
 
@@ -16,6 +17,9 @@ function verificarPermissoes() {
     }
     if (acessoRestrito) {
       acessoRestrito.style.display = "block";
+    }
+    if(usuarioTab){
+      usuarioTab.style.display = "none";
     }
   }
 

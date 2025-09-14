@@ -4,6 +4,12 @@
   const acessoRestrito = document.getElementById('acessoRestrito');
   const perfil = (localStorage.getItem("perfil") || "comum");
   const cadastro_tab = document.getElementById("cadastro_tab");
+  const prescricoes_tab = document.getElementById("prescricoes_tab");
+  const prontuarios_tab = document.getElementById("prontuarios_tab");
+  const disponibilidade_tab = document.getElementById("disponibilidade_tab");
+  const leitos_tab = document.getElementById("leitos_tab");
+  const relatorios_tab = document.getElementById("relatorios_tab");
+  const suprimentos_tab = document.getElementById("suprimentos_tab");
 
 function verificarPermissoes() {
   const ehAdministrador = perfil === "Administrador";
@@ -19,7 +25,25 @@ console.log(ehEnfermeiro);
       acessoRestrito.style.display = 'block';
     }
     if(cadastro_tab){
-      cadastro_tab.style.background = 'red';
+      cadastro_tab.style.display = 'none';
+    }
+    if(prescricoes_tab){
+      prescricoes_tab.style.display = "none";
+    }
+    if(prontuarios_tab){
+      prontuarios_tab.style.display = "none";
+    }
+    if(disponibilidade_tab){
+      disponibilidade_tab.style.display = "none";
+    }
+    if(leitos_tab){
+      leitos_tab.style.display = "none";
+    }
+    if(relatorios_tab){
+      relatorios_tab.style.display = "none";
+    }
+    if(suprimentos_tab){
+      suprimentos_tab.style.display = "none";
     }
   }
 }

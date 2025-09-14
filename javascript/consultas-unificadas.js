@@ -24,14 +24,13 @@ function verificarPermissoes() {
     if (acessoRestrito) {
       acessoRestrito.style.display = "block";
     }
+    if( agendar_tab) {
+      substituirPorInput(nomePaciente, nomeUsuario);
+    }
 
     filtroPaciente.style.display = "block";
     filtroPaciente.readOnly = true;
     filtroPaciente.value = nomeUsuario;
-
-    nomePaciente.style.display = "block";
-    nomePaciente.readOnly = true;
-    nomePaciente.value = nomeUsuario;
 
     TabConsultas.click();
   }
@@ -64,6 +63,20 @@ document.addEventListener("DOMContentLoaded", () => {
 function valorMonetarioAleatorio() {
   const valor = Math.floor(Math.random() * (2000 - 100 + 1)) + 50;
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function substituirPorInput(elemento, valor) {
+  if (!elemento) return;
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = elemento.className;
+  input.id = elemento.id;
+  input.name = elemento.name || elemento.id;
+  input.value = valor;
+  input.readOnly = true;
+
+  elemento.parentNode.replaceChild(input, elemento);
 }
 
 function popularSelects() {
@@ -228,15 +241,11 @@ function agendarConsulta() {
     filtrados.forEach(p => {
       const card = document.createElement("div");
       card.className = "list-group-item list-group-item-action";
-      
+     
       // Verificar restrições de perfil
       let botoesAcao = "";
       if (perfil === "Administrador" || (perfil === "Médico" && p.tipoUsuario === "Paciente")) {
         botoesAcao = `
-          <div class="ms-auto">
-            <button class="btn btn-sm btn-outline-primary me-1" onclick="verDetalhesPaciente('${p.nome}')">
-              <i class="fas fa-eye"></i>
-            </button>
             ${perfil === "Administrador" ? `
               <button class="btn btn-sm btn-outline-danger" onclick="removerPaciente('${p.nome}')">
                 <i class="fas fa-trash"></i>
@@ -319,15 +328,12 @@ function agendarConsulta() {
         
         botoesAcao = `
           <div class="ms-auto">
-            <button class="btn btn-sm btn-outline-primary me-1" onclick="verDetalhesConsulta(${c.id})">
-              <i class="fas fa-eye"></i>
-            </button>
             ${status !== "Passadas" ? `
               <button class="btn btn-sm btn-outline-warning me-1" onclick="editarConsulta(${c.id})">
                 <i class="fas fa-edit"></i>
               </button>
             ` : ""}
-            ${perfil === "Administrador" && status !== "Passadas" ? `
+            ${(perfil === "Administrador" || perfil === "Médico" || perfil === "Tec. Enfermagem" || perfil ==="Paciente") && status !== "Passadas" ? `
               <button class="btn btn-sm btn-outline-danger" onclick="cancelarConsulta(${c.id})">
                 <i class="fas fa-trash"></i>
               </button>
@@ -364,14 +370,6 @@ function agendarConsulta() {
       
       lista.appendChild(card);
     });
-  }
-
-  // Detalhes do paciente
-  function verDetalhesPaciente(nome) {
-    const paciente = usuarios.find(u => u.nome === nome);
-    if (!paciente) return;
-    
-    alert(`Detalhes do Paciente:\n\nNome: ${paciente.nome}\nCPF: ${paciente.cpf}\nNascimento: ${paciente.nascimento}\nEmail: ${paciente.email}\nTipo: ${paciente.tipoUsuario}`);
   }
 
   // Remover paciente
@@ -470,8 +468,6 @@ function agendarConsulta() {
     consultas = consultas.filter(c => c.id !== id);
     localStorage.setItem("consultas", JSON.stringify(consultas));
     
-    bootstrap.Modal.getInstance(document.getElementById("modalConsulta")).hide();
-    
     const agendarTab = new bootstrap.Tab(document.getElementById("agendar-tab"));
     agendarTab.show();
     
@@ -481,20 +477,21 @@ function agendarConsulta() {
   // Cancelar consulta
   function cancelarConsulta(id) {
     if (!confirm("Tem certeza que deseja cancelar esta consulta?")) return;
-    
-    if (perfil !== "Administrador") {
+   
+    const paciente = consultas.find(c => c.id === id)?.paciente;
+
+    if (perfil === "Administrador" || (perfil === "Paciente" && paciente === nomeUsuario)) {
+      
+      const index = consultas.findIndex(c => c.id === id);
+      if (index !== -1) {
+        consultas.splice(index, 1);
+        localStorage.setItem("consultas", JSON.stringify(consultas));
+        renderConsultas();
+      }
+    }else{
       alert("Acesso negado: apenas administradores podem cancelar consultas.");
-      return;
+        return;
     }
-    
-    const index = consultas.findIndex(c => c.id === id);
-    if (index !== -1) {
-      consultas.splice(index, 1);
-      localStorage.setItem("consultas", JSON.stringify(consultas));
-      renderConsultas();
-    }
-    
-    bootstrap.Modal.getInstance(document.getElementById("modalConsulta")).hide();
   }
 
   // Funções auxiliares
