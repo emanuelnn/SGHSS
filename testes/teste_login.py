@@ -84,11 +84,11 @@ def testar_dashboard(driver, wait):
 
         # Elementos principais
         elementos = [
-            ("Cadastro Geral", "cadastro.html"),
+            ("Cadastro de Usuários", "cadastro.html"),
             ("Agendar Consulta", "consultas-unificadas.html"),
-            ("Ver Prontuários", "prontuarios.html"),
-            ("Leitos de Internação", "leitos.html"),
-            ("Prescrições", "prescricoes.html"),
+            ("Prontuários Eletrônicos", "prontuarios.html"),
+            ("Gestão de Leitos", "leitos.html"),
+            ("Prescrições Médicas", "prescricoes.html"),
         ]
 
         for texto, link in elementos:

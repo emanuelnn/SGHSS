@@ -7,6 +7,7 @@ const agendar_tab = document.getElementById("agendar-tab");
 const pacientes_tab = document.getElementById("pacientes-tab");
 const acessoRestrito = document.getElementById("acessoRestrito");
 const filtroPaciente = document.getElementById("filtroConsulta");
+const nomePaciente = document.getElementById("nomePaciente");
 const TabConsultas = document.getElementById("consultas-tab");
 const nomeUsuario = localStorage.getItem("nomeUsuario") || "";
 const perfil = (localStorage.getItem("perfil") || "comum");
@@ -17,9 +18,6 @@ function verificarPermissoes() {
   const ehEnfermeiro = perfil === "Tec. Enfermagem";
 
   if (!(ehAdministrador || ehMedico || ehEnfermeiro)) {
-    if (agendar_tab) {
-      agendar_tab.style.display = "none";
-    }
     if (pacientes_tab) {
       pacientes_tab.style.display = "none";
     }
@@ -30,6 +28,11 @@ function verificarPermissoes() {
     filtroPaciente.style.display = "block";
     filtroPaciente.readOnly = true;
     filtroPaciente.value = nomeUsuario;
+
+    nomePaciente.style.display = "block";
+    nomePaciente.readOnly = true;
+    nomePaciente.value = nomeUsuario;
+
     TabConsultas.click();
   }
   return true;
